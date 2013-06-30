@@ -29,6 +29,13 @@
 #define OUTFLOW 3
 
 /**
+ * Define boundary conditions for temperature
+ */
+#define SET_TEMP 1
+#define ADIABATIC 2
+
+
+/**
  * Define obstacle cells
  */
 #define C_B 1
