@@ -133,7 +133,8 @@ int main(int argc, char** argv){
 	while (t<t_end){
 		/*	Select dt*/
 		calculate_dt(Re, Pr, tau, &dt, dx, dy, imax, jmax, U, V, Flag);
-        printf("dt = %f\n", dt);
+/*        printf("dt = %f\n", dt);
+ */
 		/*	Set boundary values for u and v according to (14),(15)*/
 		boundaryvalues(imax, jmax, U, V, wl, wr, wt, wb, Flag);
 		/*  Set special boundary values according to the problem*/
