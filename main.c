@@ -97,7 +97,7 @@ int main(int argc, char** argv){
 	double lp;			/* pressure in left boundary */
 	double rp;			/* pressure in right boundary */
 	double dp;          /* change in pressure with right boundary = 0 */
-	char problem[80];
+	char problem[200];
 	int n_div;
     
 	/* read the program configuration file using read_parameters()*/
@@ -131,6 +131,7 @@ int main(int argc, char** argv){
 	while (t<t_end){
 		/*	Select dt*/
 		calculate_dt(Re, Pr, tau, &dt, dx, dy, imax, jmax, U, V, Flag);
+        printf("dt = %f\n", dt);
 		/*	Set boundary values for u and v according to (14),(15)*/
 		boundaryvalues(imax, jmax, U, V, wl, wr, wt, wb, Flag);
 		/*  Set special boundary values according to the problem*/

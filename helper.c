@@ -69,7 +69,7 @@ void errhandler( int nLine, const char *szFile, const char *szString )
 
 /*  for comfort */
 #define READ_ERROR(szMessage, szVarName, szFileName, nLine) \
-{ char szTmp[80]; \
+{ char szTmp[200]; \
 if( nLine ) \
 sprintf( szTmp, " %s  File: %s   Variable: %s  Line: %d", szMessage, szFileName, szVarName, nLine ); \
 else \
@@ -243,7 +243,7 @@ void write_matrix( const char* szFileName,       /* filename */
         fh = fopen( szFileName, "w");	/* overwrite file/write new file */
         if( fh == NULL )			/* opening failed ? */
         {
-            char szBuff[80];
+            char szBuff[200];
             sprintf( szBuff, "Outputfile %s cannot be created", szFileName );
             ERROR( szBuff );
         }
@@ -255,7 +255,7 @@ void write_matrix( const char* szFileName,       /* filename */
         fh = fopen( szFileName ,"a");	/* append to the file */
         if( fh == NULL )			/* opening failed ? */
         {
-            char szBuff[80];
+            char szBuff[200];
             sprintf( szBuff, "Outputfile %s cannot be opened", szFileName );
             ERROR( szBuff );
         }
@@ -272,7 +272,7 @@ void write_matrix( const char* szFileName,       /* filename */
     
     if( fclose(fh) )
     {
-        char szBuff[80];
+        char szBuff[200];
         sprintf( szBuff, "Outputfile %s cannot be closed", szFileName );
         ERROR( szBuff );
     };
@@ -298,7 +298,7 @@ void write_imatrix( const char* szFileName,       /* filename */
         fh = fopen( szFileName, "w");	/* overwrite file/write new file */
         if( fh == NULL )			/* opening failed ? */
         {
-            char szBuff[80];
+            char szBuff[200];
             sprintf( szBuff, "Outputfile %s cannot be created", szFileName );
             ERROR( szBuff );
         }
@@ -310,7 +310,7 @@ void write_imatrix( const char* szFileName,       /* filename */
         fh = fopen( szFileName ,"a");	/* append to the file */
         if( fh == NULL )			/* opening failed ? */
         {
-            char szBuff[80];
+            char szBuff[200];
             sprintf( szBuff, "Outputfile %s cannot be opened", szFileName );
             ERROR( szBuff );
         }
@@ -327,7 +327,7 @@ void write_imatrix( const char* szFileName,       /* filename */
 
     if( fclose(fh) )
     {
-        char szBuff[80];
+        char szBuff[200];
         sprintf( szBuff, "Outputfile %s cannot be closed", szFileName );
         ERROR( szBuff );
     };
@@ -352,7 +352,7 @@ void read_matrix( const char* szFileName,       /* filename */
     fh = fopen( szFileName, "r");	/* overwrite file/write new file */
     if( fh == NULL )			/* opening failed ? */
     {
-        char szBuff[80];
+        char szBuff[200];
         sprintf( szBuff, "Can not read file %s !!!", szFileName );
         ERROR( szBuff );
     }
@@ -366,7 +366,7 @@ void read_matrix( const char* szFileName,       /* filename */
     
     if( fclose(fh) )
     {
-        char szBuff[80];
+        char szBuff[200];
         /*orig bug:
          sscanf( szBuff, "Inputfile %s cannot be closed", szFileName );*/
         sprintf( szBuff, "Inputfile %s cannot be closed", szFileName );
@@ -488,7 +488,7 @@ int **read_pgm(const char *filename)
     
     if ((input=fopen(filename,"rb"))==0)
     {
-        char szBuff[80];
+        char szBuff[200];
         sprintf( szBuff, "Can not read file %s !!!", filename );
         ERROR( szBuff );
     }

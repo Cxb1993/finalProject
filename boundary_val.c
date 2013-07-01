@@ -260,13 +260,13 @@ void TEMP_BoundaryCondition(
     
     switch(wlt){
         case SET_TEMP:
-            for (j = 1; j < jmax + 1; j++){
+            for (j = 0; j <= jmax + 1; j++){
                 /*Temperature on left boundary */
                 TEMP[0][j]=2.0*TL-1*TEMP[1][j];
             }
             break;
         case ADIABATIC:
-            for (j = 1; j < jmax + 1; j++){
+            for (j = 0; j <= jmax + 1; j++){
                 /*Temperature on left boundary */
                 TEMP[0][j] = TEMP[1][j];
             }
@@ -279,12 +279,12 @@ void TEMP_BoundaryCondition(
     
 	switch(wrt){
         case SET_TEMP:
-            for (j = 1; j < jmax + 1; j++){
+            for (j = 0; j <= jmax + 1; j++){
                 TEMP[imax+1][j]=2.0*TR-1*TEMP[imax][j];
             }
             break;
         case ADIABATIC:
-            for (j = 1; j < jmax + 1; j++){
+            for (j = 0; j <= jmax + 1; j++){
                 TEMP[imax+1][j] = TEMP[imax][j];
             }
             break;
@@ -295,12 +295,12 @@ void TEMP_BoundaryCondition(
 	/*Set values for the top boundary*/
 	switch(wtt){
         case SET_TEMP:
-            for (i = 1; i < imax + 1; i++){
+            for (i = 0; i <= imax + 1; i++){
                 TEMP[i][jmax+1]= 2.0*TT-1*TEMP[i][jmax];
             }
             break;
         case ADIABATIC:
-            for (i = 1; i < imax + 1; i++){
+            for (i = 0; i <= imax + 1; i++){
                 TEMP[i][jmax+1] = TEMP[i][jmax];
             }
             break;
@@ -311,12 +311,12 @@ void TEMP_BoundaryCondition(
 	/*Set values for the bottom boundary*/
 	switch(wbt){
         case SET_TEMP:
-            for (i = 1; i < imax + 1; i++){
+            for (i = 0; i <= imax + 1; i++){
                 TEMP[i][0]=2.0*TB-1*TEMP[i][1];
             }
             break;
         case ADIABATIC:
-            for (i = 1; i < imax + 1; i++){
+            for (i = 0; i <= imax + 1; i++){
                 TEMP[i][0] = TEMP[i][1];
             }
             break;

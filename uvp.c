@@ -322,6 +322,38 @@ void COMP_TEMP(
                double Pr,
                double beta
                ){
-    /*EQ. 9.20 of what they have sent to us*/
+    int i ;
+	int j ;
+	
+    double d2tdx2 ;
+	double d2tdy2 ;
+    
+    double dutdx ;
+    double dvtdy ;
+    
+	/*Determines the value of Temperature according to the formula 9.20 with the help of temporary variables*/
+	for ( i = 1 ; i <= imax ; i++ )
+	{
+		for( j = 1 ; j <= jmax ; j++ )
+		{
+			/*
+			 * We need to check that the cell is actually a fluid cell.
+			 */
+			if( ( ( Flag[i][j]&B_C ) == B_C ) ){
+				d2tdx2 = ( TEMP[i+1][j]  - 2*TEMP[i][j] + TEMP[i-1][j] ) / ( dx * dx) ;
+                
+				d2tdy2 = ( TEMP[i][j+1]  - 2*TEMP[i][j] + TEMP[i][j-1] ) / (dy * dy ) ;
+                
+				dutdx = (1/dx) * ( U[i][j]*( ( TEMP[i][j] + TEMP[i+1][j] )/2 ) - U[i-1][j]*( TEMP[i-1][j] + TEMP[i][j] )/2 )
+                    + gamma/dx * ( abs( U[i][j] )  * ( TEMP[i][j] - TEMP[i+1][j] ) / 2 - abs( U[i-1][j] )  * ( TEMP[i-1][j] - TEMP[i][j] ) / 2  ) ;
+                
+				dvtdy = (1/dy) * ( V[i][j]*( ( TEMP[i][j] + TEMP[i][j+1] )/2 ) - V[i][j-1]*( TEMP[i][j-1] + TEMP[i][j] )/2 )
+                    + gamma/dy * ( abs( V[i][j] )  * ( TEMP[i][j] - TEMP[i][j+1] ) / 2 - abs( V[i][j-1] )  * ( TEMP[i][j-1] - TEMP[i][j] ) / 2  ) ;
+                
+				TEMP[i][j] = TEMP[i][j]  + dt * ( 1/(Re*Pr) * ( (d2tdx2) + (d2tdy2) ) - (dutdx)  - (dvtdy) );
+                
+			}
+        }
+    }
 }
 

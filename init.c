@@ -92,7 +92,7 @@ int read_parameters(double *Re,                /* reynolds number   */
                     char *argv
                     )
 {
-	char szFileName[80];
+	char szFileName[200];
 	strcpy(szFileName, argv);
 	strcat(szFileName, ".dat");
     

@@ -19,13 +19,13 @@ void write_vtkFile(const char *szProblem,
                    ) {
     
     int i,j;
-    char szFileName[80];
+    char szFileName[200];
     FILE *fp=NULL;
     sprintf( szFileName, "%s.%i.vtk", szProblem, timeStepNumber );
     fp = fopen( szFileName, "w");
     if( fp == NULL )
     {
-        char szBuff[80];
+        char szBuff[200];
         sprintf( szBuff, "Failed to open %s", szFileName );
         ERROR( szBuff );
         return;
@@ -71,7 +71,7 @@ void write_vtkFile(const char *szProblem,
 
     if( fclose(fp) )
     {
-        char szBuff[80];
+        char szBuff[200];
         sprintf( szBuff, "Failed to close %s", szFileName );
         ERROR( szBuff );
     }
@@ -82,7 +82,7 @@ void write_vtkHeader( FILE *fp, int imax, int jmax,
                      double dx, double dy) {
     if( fp == NULL )
     {
-        char szBuff[80];
+        char szBuff[200];
         sprintf( szBuff, "Null pointer in write_vtkHeader" );
         ERROR( szBuff );
         return;
