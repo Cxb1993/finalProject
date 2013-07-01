@@ -1,4 +1,5 @@
 #include "helper.h"
+#include "geometry.h"
 #include "visual.h"
 #include "init.h"
 #include "boundary_val.h"
@@ -6,7 +7,7 @@
 #include "sor.h"
 #include <stdio.h>
 
-/* CFD Lab - Worksheet 3 - Group 3
+/* CFD Lab - Final project - Group 3
  * Camacho Barranco, Roberto
  * Gavranovic, Stefan
  * Valizadeh, Mahyar
@@ -109,6 +110,7 @@ int main(int argc, char** argv){
 	n = 0;
 
 	/* create the initial setup init_uvp()*/
+	create_geometry("test.pgm", imax, jmax, dx, dy, 3, 4, 3, 4);
 	init_flag(problem, imax, jmax, lp, rp, dp, Flag);
 	init_uvp(UI, VI, PI, imax, jmax, U, V, P, Flag);
 

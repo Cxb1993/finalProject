@@ -279,6 +279,51 @@ void calculate_uv(
 					V[i][j] = G[i][j]-(dt/dy)*(P[i][j+1]-P[i][j]);
 				}
 			}
+			else if((Flag[i][j]&31)==B_N){
+				V[i][j]=0;
+				U[i-1][j]=-1*U[i-1][j+1];
+				U[i][j]=-1*U[i][j+1];
+			}
+			else if((Flag[i][j]&31)==B_S){
+				V[i][j-1]=0;
+				U[i-1][j]=-1*U[i-1][j-1];
+				U[i][j]=-1*U[i][j-1];
+			}
+			else if((Flag[i][j]&31)==B_W){
+				U[i-1][j]=0;
+				V[i][j-1]=-1*V[i-1][j-1];
+				V[i][j]=-1*V[i-1][j];
+			}
+			else if((Flag[i][j]&31)==B_O){
+				U[i][j]=0;
+				V[i][j-1]=-1*V[i+1][j-1];
+				V[i][j]=-1*V[i+1][j];
+			}
+			else if((Flag[i][j]&31)==B_NO){
+				U[i][j]=0;
+				U[i-1][j]=-1*U[i-1][j+1];
+				V[i][j]=0;
+				V[i][j-1]=-1*V[i+1][j-1];
+			}
+			else if((Flag[i][j]&31)==B_NW){
+				U[i-1][j]=0;
+				U[i][j]=-1*U[i][j+1];
+				V[i][j]=0;
+				V[i][j-1]=-1*V[i-1][j-1];
+			}
+			else if((Flag[i][j]&31)==B_SO){
+				U[i][j]=0;
+				U[i-1][j]=-1*U[i-1][j-1];
+				V[i][j-1]=0;
+				V[i][j]=-1*V[i+1][j];
+			}
+			else if((Flag[i][j]&31)==B_SW){
+				U[i-1][j]=0;
+				U[i][j]=-1*U[i][j-1];
+				V[i][j]=-1*V[i-1][j];
+				V[i][j-1]=0;
+			}
+
 		}
 	}
 }
