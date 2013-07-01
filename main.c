@@ -143,7 +143,7 @@ int main(int argc, char** argv){
         COMP_TEMP(dt, dx, dy, imax, jmax, U, V, F, G, TEMP, Flag, GX, GY, gamma, Re, Pr, beta);
         
 		/*	Compute F(n) and G(n) according to (9),(10),(17)*/
-		calculate_fg(Re, GX, GY, alpha, dt, dx, dy, imax, jmax, U, V ,F , G, Flag);
+		calculate_fg(Re, GX, GY, alpha, dt, dx, dy, imax, jmax, U, V ,F , G, TEMP, beta, Flag);
 		/*	Compute the right-hand side rs of the pressure equation (11)*/
 		calculate_rs(dt, dx, dy, imax, jmax, F, G, RS);
 		/*	Set it := 0*/
@@ -163,7 +163,7 @@ int main(int argc, char** argv){
         
 		n_div=(int)(dt_value/dt);
 		if(n % n_div == 0){
-			write_vtkFile(problem, n , xlength, ylength, imax, jmax, dx, dy, U, V, P, Flag);
+			write_vtkFile(problem, n , xlength, ylength, imax, jmax, dx, dy, U, V, P, TEMP, Flag);
 		}
 		/*	t := t + dt*/
 		t = t + dt;

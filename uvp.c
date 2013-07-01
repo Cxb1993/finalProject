@@ -42,6 +42,8 @@ void calculate_fg(
                   double **V,
                   double **F,
                   double **G,
+                  double **TEMP,
+                  double beta,
                   int **Flag
                   )
 
@@ -57,6 +59,10 @@ void calculate_fg(
 	double duvdx ;
 	double d2vdx2 ;
 	double d2vdy2 ;
+    
+    double F_temp;
+    double G_temp;
+    
     
 	/*Determines the value of F according to the formula above with the help of temporary variables*/
 	for ( i = 1 ; i <= imax ; i++ )
@@ -77,7 +83,9 @@ void calculate_fg(
 				duvdy = (1/dy) * ( ( V[i][j] + V[i+1][j] ) /2  *  ( U[i][j] + U[i][j+1] )/2 - (V[i][j-1] + V[i+1][j-1])/2 * (U[i][j-1] + U[i][j])/2  ) +
                 alpha/dy * (abs( V[i][j] + V[i+1][j] ) /2  *  ( U[i][j] - U[i][j+1] )/2 - abs(V[i][j-1] + V[i+1][j-1])/2 * (U[i][j-1] - U[i][j])/2 ) ;
                 
-				F[i][j] = U[i][j]  + dt * ( 1/Re * ( (d2udx2 ) + (d2udy2) ) - (du2dx)  - duvdy + GX ) ;
+                F_temp = beta* dt/2*(TEMP[i][j]+TEMP[i+1][j])*GX;
+
+				F[i][j] = U[i][j]  + dt * ( 1/Re * ( (d2udx2 ) + (d2udy2) ) - (du2dx)  - duvdy + GX ) - F_temp;
                 
 			}
 			/*Determines the value of G according to the formula above with the help of temporary variables*/
@@ -92,7 +100,9 @@ void calculate_fg(
 				dv2dy = (1/dy) * ( ( (V[i][j] + V[i][j+1])/2 )*( (V[i][j] + V[i][j+1])/2 ) - ( (V[i][j-1] + V[i][j])/2 )* (V[i][j-1] + V[i][j])/2 )  +
                 alpha/dy * ( abs( V[i][j] + V[i][j+1] ) / 2  * ( V[i][j] - V[i][j+1] ) / 2 - abs( V[i][j-1] + V[i][j] ) / 2  * (  V[i][j-1] - V[i][j]  ) / 2   ) ;
                 
-				G[i][j] = V[i][j]  + dt * ( 1/Re * ( (d2vdx2 ) + (d2vdy2) ) - (duvdx)  - dv2dy + GY ) ;
+                G_temp = beta* dt/2*(TEMP[i][j]+TEMP[i][j+1])*GY;
+                
+				G[i][j] = V[i][j]  + dt * ( 1/Re * ( (d2vdx2 ) + (d2vdy2) ) - (duvdx)  - dv2dy + GY ) - G_temp ;
 			}
 			/*
 			 * In case its a boundary cell, then we check it by comparing the flags and calculate

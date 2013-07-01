@@ -37,6 +37,8 @@ void calculate_fg(
                   double **V,
                   double **F,
                   double **G,
+                  double **TEMP,
+                  double beta,
                   int **Flag
                   );
 
