@@ -14,17 +14,18 @@ void write_vtkFile(const char *szProblem,
 		double **U,
 		double **V,
 		double **P,
+                   double **TEMP,
 		int **Flag
 ) {
 
 	int i,j;
-	char szFileName[80];
+    char szFileName[200];
 	FILE *fp=NULL;
 	sprintf( szFileName, "%s.%i.vtk", szProblem, timeStepNumber );
 	fp = fopen( szFileName, "w");
 	if( fp == NULL )
 	{
-		char szBuff[80];
+        char szBuff[200];
 		sprintf( szBuff, "Failed to open %s", szFileName );
 		ERROR( szBuff );
 		return;
@@ -56,6 +57,18 @@ void write_vtkFile(const char *szProblem,
 		}
 	}
 
+    
+    fprintf(fp,"\n");
+/*    fprintf(fp,"CELL_DATA %i \n", ((imax)*(jmax)) ); */
+    fprintf(fp, "SCALARS temperature float 1 \n");
+    fprintf(fp, "LOOKUP_TABLE default \n");
+    for(j = 1; j < jmax+1; j++) {
+        for(i = 1; i < imax+1; i++) {
+            fprintf(fp, "%f\n", TEMP[i][j] );
+        }
+    }
+ 
+
 	fprintf(fp,"\n");
 	fprintf(fp, "SCALARS flag int 1 \n");
 	fprintf(fp, "LOOKUP_TABLE default \n");
@@ -67,7 +80,7 @@ void write_vtkFile(const char *szProblem,
 
 	if( fclose(fp) )
 	{
-		char szBuff[80];
+        char szBuff[200];
 		sprintf( szBuff, "Failed to close %s", szFileName );
 		ERROR( szBuff );
 	}
@@ -78,7 +91,7 @@ void write_vtkHeader( FILE *fp, int imax, int jmax,
 		double dx, double dy) {
 	if( fp == NULL )
 	{
-		char szBuff[80];
+        char szBuff[200];
 		sprintf( szBuff, "Null pointer in write_vtkHeader" );
 		ERROR( szBuff );
 		return;

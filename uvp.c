@@ -29,21 +29,23 @@
  *
  */
 void calculate_fg(
-		double Re,
-		double GX,
-		double GY,
-		double alpha,
-		double dt,
-		double dx,
-		double dy,
-		int imax,
-		int jmax,
-		double **U,
-		double **V,
-		double **F,
-		double **G,
-		int **Flag
-)
+                  double Re,
+                  double GX,
+                  double GY,
+                  double alpha,
+                  double dt,
+                  double dx,
+                  double dy,
+                  int imax,
+                  int jmax,
+                  double **U,
+                  double **V,
+                  double **F,
+                  double **G,
+                  double **TEMP,
+                  double beta,
+                  int **Flag
+                  )
 
 {
 	int i ;
@@ -52,12 +54,16 @@ void calculate_fg(
 	double duvdy ;
 	double d2udx2 ;
 	double d2udy2 ;
-
+    
 	double dv2dy ;
 	double duvdx ;
 	double d2vdx2 ;
 	double d2vdy2 ;
-
+    
+    double F_temp;
+    double G_temp;
+    
+    
 	/*Determines the value of F according to the formula above with the help of temporary variables*/
 	for ( i = 1 ; i <= imax ; i++ )
 	{
@@ -68,31 +74,35 @@ void calculate_fg(
 			 */
 			if(((Flag[i][j]&B_C)==B_C)&& i<imax ){
 				d2udx2 = ( U[i+1][j]  - 2*U[i][j] + U[i-1][j] ) / ( dx * dx) ;
-
+                
 				d2udy2 = ( U[i][j+1]  - 2*U[i][j] + U[i][j-1]) / (dy * dy )  ;
-
+                
 				du2dx = (1/dx) * ( ( (U[i][j] + U[i+1][j])/2 )*( (U[i][j] + U[i+1][j])/2 ) - ( (U[i-1][j] + U[i][j])/2 )*( (U[i-1][j] + U[i][j])/2 ) ) +
-						alpha/dx * ( abs( U[i][j] + U[i+1][j] ) / 2  * ( U[i][j] - U[i+1][j] ) / 2 - abs( U[i-1][j] + U[i][j] ) / 2  * ( U[i-1][j] - U[i][j] ) / 2   ) ;
-
+                alpha/dx * ( abs( U[i][j] + U[i+1][j] ) / 2  * ( U[i][j] - U[i+1][j] ) / 2 - abs( U[i-1][j] + U[i][j] ) / 2  * ( U[i-1][j] - U[i][j] ) / 2   ) ;
+                
 				duvdy = (1/dy) * ( ( V[i][j] + V[i+1][j] ) /2  *  ( U[i][j] + U[i][j+1] )/2 - (V[i][j-1] + V[i+1][j-1])/2 * (U[i][j-1] + U[i][j])/2  ) +
-						alpha/dy * (abs( V[i][j] + V[i+1][j] ) /2  *  ( U[i][j] - U[i][j+1] )/2 - abs(V[i][j-1] + V[i+1][j-1])/2 * (U[i][j-1] - U[i][j])/2 ) ;
+                alpha/dy * (abs( V[i][j] + V[i+1][j] ) /2  *  ( U[i][j] - U[i][j+1] )/2 - abs(V[i][j-1] + V[i+1][j-1])/2 * (U[i][j-1] - U[i][j])/2 ) ;
+                
+                F_temp = beta* dt/2*(TEMP[i][j]+TEMP[i+1][j])*GX;
 
-				F[i][j] = U[i][j]  + dt * ( 1/Re * ( (d2udx2 ) + (d2udy2) ) - (du2dx)  - duvdy + GX ) ;
-
+				F[i][j] = U[i][j]  + dt * ( 1/Re * ( (d2udx2 ) + (d2udy2) ) - (du2dx)  - duvdy + GX ) - F_temp;
+                
 			}
 			/*Determines the value of G according to the formula above with the help of temporary variables*/
 			if(((Flag[i][j]&B_C)==B_C) && j<jmax ){
 				d2vdx2 = ( V[i+1][j]  - 2*V[i][j] + V[i-1][j] ) / ( dx * dx) ;
-
+                
 				d2vdy2 = ( V[i][j+1]  - 2*V[i][j] + V[i][j-1]) / (dy * dy )  ;
-
+                
 				duvdx = (1/dx) * ( ( V[i][j] + V[i+1][j] ) /2  *  ( U[i][j] + U[i][j+1] )/2 - (U[i-1][j] + U[i-1][j+1])/2 * (V[i-1][j] + V[i][j])/2  ) +
-						alpha/dx * (( V[i][j] - V[i+1][j] ) /2  *  abs( U[i][j] + U[i][j+1] )/2 - abs(U[i-1][j] + U[i-1][j+1])/2 * (V[i-1][j] - V[i][j])/2 ) ;
-
+                alpha/dx * (( V[i][j] - V[i+1][j] ) /2  *  abs( U[i][j] + U[i][j+1] )/2 - abs(U[i-1][j] + U[i-1][j+1])/2 * (V[i-1][j] - V[i][j])/2 ) ;
+                
 				dv2dy = (1/dy) * ( ( (V[i][j] + V[i][j+1])/2 )*( (V[i][j] + V[i][j+1])/2 ) - ( (V[i][j-1] + V[i][j])/2 )* (V[i][j-1] + V[i][j])/2 )  +
-						alpha/dy * ( abs( V[i][j] + V[i][j+1] ) / 2  * ( V[i][j] - V[i][j+1] ) / 2 - abs( V[i][j-1] + V[i][j] ) / 2  * (  V[i][j-1] - V[i][j]  ) / 2   ) ;
-
-				G[i][j] = V[i][j]  + dt * ( 1/Re * ( (d2vdx2 ) + (d2vdy2) ) - (duvdx)  - dv2dy + GY ) ;
+                alpha/dy * ( abs( V[i][j] + V[i][j+1] ) / 2  * ( V[i][j] - V[i][j+1] ) / 2 - abs( V[i][j-1] + V[i][j] ) / 2  * (  V[i][j-1] - V[i][j]  ) / 2   ) ;
+                
+                G_temp = beta* dt/2*(TEMP[i][j]+TEMP[i][j+1])*GY;
+                
+				G[i][j] = V[i][j]  + dt * ( 1/Re * ( (d2vdx2 ) + (d2vdy2) ) - (duvdx)  - dv2dy + GY ) - G_temp ;
 			}
 			/*
 			 * In case its a boundary cell, then we check it by comparing the flags and calculate
@@ -128,15 +138,15 @@ void calculate_fg(
 			}
 		}
 	}
-
-
+    
+    
 	/*Set boundary values along the columns*/
 	for (j = 1; j <= jmax; j++){
 		/*F values on right and left boundaries*/
 		F[0][j] = U[0][j];
 		F[imax][j] = U[imax][j];
 	}
-
+    
 	/*Set boundary values along the rows*/
 	for (i = 1; i <= imax; i++){
 		/*G values on top and bottom boundaries*/
@@ -157,15 +167,15 @@ void calculate_fg(
  *
  */
 void calculate_rs(
-		double dt,
-		double dx,
-		double dy,
-		int imax,
-		int jmax,
-		double **F,
-		double **G,
-		double **RS
-) {
+                  double dt,
+                  double dx,
+                  double dy,
+                  int imax,
+                  int jmax,
+                  double **F,
+                  double **G,
+                  double **RS
+                  ) {
 	int i, j;
 	for(i = 1; i <= imax; i++) {
 		for(j = 1; j <= jmax; j++) {
@@ -187,48 +197,53 @@ void calculate_rs(
  *
  */
 void calculate_dt(
-		double Re,
-		double tau,
-		double *dt,
-		double dx,
-		double dy,
-		int imax,
-		int jmax,
-		double **U,
-		double **V,
-		int **Flag
-) {
+                  double Re,
+                  double Pr,
+                  double tau,
+                  double *dt,
+                  double dx,
+                  double dy,
+                  int imax,
+                  int jmax,
+                  double **U,
+                  double **V,
+                  int **Flag
+                  ) {
 	/*calculates maximum absolute velocities in x and y direction*/
 	double umax=0, vmax=0;
-	double a,b,c;
+	double a,b,c,d;
 	int i, j;
 	for(i = 1; i <= imax; i++) {
 		for(j = 1; j<=jmax; j++) {
 			if((Flag[i][j]&B_C)==B_C){
 				if(abs(U[i][j])>umax)
 					umax = abs(U[i][j]);
-
+                
 				if(abs(V[i][j])>vmax)
 					vmax = abs(V[i][j]);
-
+                
 			}
 		}
 	}
-
+    
 	/*Determines the minimum of dt according to stability criteria and multiply it by safety factor tau if tau is positive, otherwise uses the default value of dt*/
 	if (tau>0){
 		a = Re/(2.0*(1.0/(dx*dx)+1.0/(dy*dy)));
 		b = dx/umax;
 		c = dy/vmax;
-		if(a < b && a < c){
+        d = Pr*Re/(2.0*(1.0/(dx*dx)+1.0/(dy*dy)));
+		if     (a < b && a < c && a < d){
 			*dt = tau * a;
 		}
-		else if(b < a && b < c){
+		else if(b < a && b < c && b < d){
 			*dt = tau * b;
 		}
-		else{
+		else if(c < a && c < b && c < d){
 			*dt = tau * c;
 		}
+        else{
+            *dt = tau * d;
+        }
 	}
 }
 
@@ -250,18 +265,18 @@ void calculate_dt(
  * @image html calculate_uv.jpg
  */
 void calculate_uv(
-		double dt,
-		double dx,
-		double dy,
-		int imax,
-		int jmax,
-		double **U,
-		double **V,
-		double **F,
-		double **G,
-		double **P,
-		int **Flag
-){
+                  double dt,
+                  double dx,
+                  double dy,
+                  int imax,
+                  int jmax,
+                  double **U,
+                  double **V,
+                  double **F,
+                  double **G,
+                  double **P,
+                  int **Flag
+                  ){
 	int i;
 	int j;
 	for(i = 1; i <= imax; i++){
@@ -327,3 +342,63 @@ void calculate_uv(
 		}
 	}
 }
+
+
+/* ----------------------------------------------------------------------- */
+/*                             Function Compute temperatue                 */
+/* ----------------------------------------------------------------------- */
+
+void COMP_TEMP(
+               double dt,
+               double dx,
+               double dy,
+               int imax,
+               int jmax,
+               double **U,
+               double **V,
+               double **F,
+               double **G,
+               double **TEMP,
+               int **Flag,
+               double GX,
+               double GY,
+               double gamma,
+               double Re,
+               double Pr,
+               double beta
+               ){
+    int i ;
+	int j ;
+	
+    double d2tdx2 ;
+	double d2tdy2 ;
+    
+    double dutdx ;
+    double dvtdy ;
+    
+	/*Determines the value of Temperature according to the formula 9.20 with the help of temporary variables*/
+	for ( i = 1 ; i <= imax ; i++ )
+	{
+		for( j = 1 ; j <= jmax ; j++ )
+		{
+			/*
+			 * We need to check that the cell is actually a fluid cell.
+			 */
+			if( ( ( Flag[i][j]&B_C ) == B_C ) ){
+				d2tdx2 = ( TEMP[i+1][j]  - 2*TEMP[i][j] + TEMP[i-1][j] ) / ( dx * dx) ;
+                
+				d2tdy2 = ( TEMP[i][j+1]  - 2*TEMP[i][j] + TEMP[i][j-1] ) / (dy * dy ) ;
+                
+				dutdx = (1/dx) * ( U[i][j]*( ( TEMP[i][j] + TEMP[i+1][j] )/2 ) - U[i-1][j]*( TEMP[i-1][j] + TEMP[i][j] )/2 )
+                    + gamma/dx * ( abs( U[i][j] )  * ( TEMP[i][j] - TEMP[i+1][j] ) / 2 - abs( U[i-1][j] )  * ( TEMP[i-1][j] - TEMP[i][j] ) / 2  ) ;
+                
+				dvtdy = (1/dy) * ( V[i][j]*( ( TEMP[i][j] + TEMP[i][j+1] )/2 ) - V[i][j-1]*( TEMP[i][j-1] + TEMP[i][j] )/2 )
+                    + gamma/dy * ( abs( V[i][j] )  * ( TEMP[i][j] - TEMP[i][j+1] ) / 2 - abs( V[i][j-1] )  * ( TEMP[i][j-1] - TEMP[i][j] ) / 2  ) ;
+                
+				TEMP[i][j] = TEMP[i][j]  + dt * ( 1/(Re*Pr) * ( (d2tdx2) + (d2tdy2) ) - (dutdx)  - (dvtdy) );
+                
+			}
+        }
+    }
+}
+

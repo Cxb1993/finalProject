@@ -23,7 +23,7 @@
  * @param ylength    domain lenght y-direction
  * @param dt         time step length: dividing t_end by dt gives the number of
  *                   time steps to perform. Actually dt is determined by a
- *                   function, so manipulating this value within the 
+ *                   function, so manipulating this value within the
  *                   configuration file should not affect the solution process
  *                   at all
  * @param dx         cell length x-direction
@@ -38,67 +38,81 @@
  * @param dt_value   time steps for output (after how many time steps one should
  *                   write into the output file)
  */
-int read_parameters( 
-		double *Re,
-		double *UI,
-		double *VI,
-		double *PI,
-		double *GX,
-		double *GY,
-		double *t_end,
-		double *xlength,
-		double *ylength,
-		double *dt,
-		double *dx,
-		double *dy,
-		int  *imax,
-		int  *jmax,
-		double *alpha,
-		double *omg,
-		double *tau,
-		int  *itermax,
-		double *eps,
-		double *dt_value,
-		int *wl,
-		int *wr,
-		int *wt,
-		int *wb,
-		char *problem,
-		double *lp,
-		double *rp,
-		double *dp,
-		int argc,
-		char *argv
-);
+int read_parameters(
+                    double *Re,
+                    double *Pr,
+                    double *beta,
+                    double *UI,
+                    double *VI,
+                    double *PI,
+                    double *TI,
+                    double *GX,
+                    double *GY,
+                    double *t_end,
+                    double *xlength,
+                    double *ylength,
+                    double *dt,
+                    double *dx,
+                    double *dy,
+                    int  *imax,
+                    int  *jmax,
+                    double *alpha,
+                    double *omg,
+                    double *gamma,
+                    double *tau,
+                    int  *itermax,
+                    double *eps,
+                    double *dt_value,
+                    int *wl,
+                    int *wr,
+                    int *wt,
+                    int *wb,
+                    char *problem,
+                    double *lp,
+                    double *rp,
+                    double *dp,
+                    int *wlt,
+                    int *wrt,
+                    int *wtt,
+                    int *wbt,
+                    double *TL,
+                    double *TR,
+                    double *TT,
+                    double *TB,
+                    int argc,
+                    char *argv
+                    );
 
 /**
  * The arrays U,V and P are initialized to the constant values UI, VI and PI on
  * the whole domain.
  */
 void init_uvp(
-		double UI,
-		double VI,
-		double PI,
-		int imax,
-		int jmax,
-		double **U,
-		double **V,
-		double **P,
-		int **Flag
-);
+              double UI,
+              double VI,
+              double PI,
+              double TI,
+              int imax,
+              int jmax,
+              double **U,
+              double **V,
+              double **P,
+              double **T,
+              int **Flag
+              );
 
 /*The array Flag is initialized with the flags C_F for fluid cells and C_B for obstacle cells as
-specified by the parameter problem. This must be followed by a loop over all cells where
-the boundary cells are marked with the appropriate flags B_xy depending on the direction, in
-which neighboring fluid cells lie.*/
+ specified by the parameter problem. This must be followed by a loop over all cells where
+ the boundary cells are marked with the appropriate flags B_xy depending on the direction, in
+ which neighboring fluid cells lie.*/
 void init_flag(
-		const char *problem,
-		int imax,
-		int jmax,
-		double lp,
-		double rp,
-		double dp,
-		int **Flag
-		);
+               const char *problem,
+               int imax,
+               int jmax,
+               double lp,
+               double rp,
+               double dp,
+               int **Flag
+               );
 #endif
 
