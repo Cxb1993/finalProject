@@ -68,20 +68,20 @@ int main(int argc, char** argv){
 	double res;		/* residual norm of the pressure equation*/
 	double eps;		/* accuracy criterion epsilon (tolerance) for pressure iteration (res < eps)*/
 	double omg;		/* relaxation factor omega for SOR iteration*/
-    double gamma;
+	double gamma;
 	double alpha;		/* upwind differencing factor alpha (see equation (4))*/
 	/* Problem-dependent quantities:*/
 	double Re;		/* Reynolds number Re*/
-    double Pr;
-    double beta;
+	double Pr;
+	double beta;
 	double GX,GY;		/* external forces gx; gy, e.g. gravity*/
 	double UI,VI,PI,TI;	/* initial data for velocities and pressure*/
-    
+
 	/* Arrays*/
 	double **U;			/* velocity in x-direction*/
 	double **V;			/* velocity in y-direction*/
 	double **P;			/* pressure*/
-    double **TEMP;			/* temperature*/
+	double **TEMP;			/* temperature*/
 	double **RS;		/* right-hand side for pressure iteration*/
 	double **F,**G;		/* F;G*/
 	int **Flag; 		/* Flag field used to classify fluid cells*/
@@ -90,62 +90,70 @@ int main(int argc, char** argv){
 	int wr;				/* boundary type for right wall (1:no-slip 2: free-slip 3: outflow) */
 	int wt;				/* boundary type for top wall (1:no-slip 2: free-slip 3: outflow) */
 	int wb;				/* boundary type for bottom wall (1:no-slip 2: free-slip 3: outflow) */
-    int wlt;				/* boundary type for left wall (1:set_temperature 2: adiabatic) */
+	int wlt;				/* boundary type for left wall (1:set_temperature 2: adiabatic) */
 	int wrt;				/* boundary type for right wall (1:set_temperature 2: adiabatic) */
 	int wtt;				/* boundary type for top wall (1:set_temperature 2: adiabatic) */
 	int wbt;				/* boundary type for bottom wall (1:set_temperature 2: adiabatic) */
-    double TL,TR,TB,TT; /* Temperature in all boundaries */
+	double TL,TR,TB,TT; /* Temperature in all boundaries */
 	double lp;			/* pressure in left boundary */
 	double rp;			/* pressure in right boundary */
 	double dp;          /* change in pressure with right boundary = 0 */
 	char problem[200];
+	char pgmFile[200];
 	int n_div;
-    
+	int fins;
+	int finWidth;
+	int finHeight;
+	int finDistance;
+
 	/* read the program configuration file using read_parameters()*/
 	read_parameters(&Re, &Pr, &beta, &UI, &VI, &PI, &TI, &GX, &GY, &t_end, &xlength, &ylength, &dt, &dx, &dy, &imax,
-                    &jmax, &alpha, &omg, &gamma, &tau, &itermax, &eps, &dt_value, &wl, &wr, &wt, &wb, problem, &lp, &rp, &dp,
-                    &wlt, &wrt, &wtt, &wbt, &TL, &TR, &TT, &TB, argc, argv[1]);
-    
+			&jmax, &alpha, &omg, &gamma, &tau, &itermax, &eps, &dt_value, &wl, &wr, &wt, &wb, problem, &lp, &rp, &dp,
+			&wlt, &wrt, &wtt, &wbt, &TL, &TR, &TT, &TB, argc, argv[1],&fins, &finWidth, &finHeight, &finDistance);
+
 	/* set up the matrices (arrays) needed using the matrix() command*/
 	U = matrix(0, imax+1, 0, jmax+1);
 	V = matrix(0, imax+1, 0, jmax+1);
 	P = matrix(0, imax+1, 0, jmax+1);
-    TEMP = matrix(0, imax+1, 0, jmax+1);
+	TEMP = matrix(0, imax+1, 0, jmax+1);
 	RS = matrix(0, imax+1, 0, jmax+1);
 	F = matrix(0, imax+1, 0, jmax+1);
 	G = matrix(0, imax+1, 0, jmax+1);
 	Flag = imatrix(0, imax+1, 0, jmax+1);
-    
+
 	/* initialize current time and time step*/
 	t = 0;
 	n = 0;
-    
+
+
+	strcpy(pgmFile, argv[1]);
+	strcat(pgmFile, ".pgm");
 	/* create the initial setup init_uvp()*/
-	create_geometry("test.pgm", imax, jmax, dx, dy, 3, 4, 3, 4);
+	create_geometry(pgmFile, imax, jmax, dx, dy, fins, finWidth, finHeight, finDistance);
 	init_flag(problem, imax, jmax, lp, rp, dp, Flag); /*Didn't do this yet*/
 	init_uvp(UI, VI, PI, TI, imax, jmax, U, V, P, TEMP, Flag);
-    
+
 	/* ----------------------------------------------------------------------- */
 	/*                             Performing the main loop                    */
 	/* ----------------------------------------------------------------------- */
-    
+
 	/* Upperbound t_end+dt/10 to be sure that it runs for t=t_end */
 	while (t<t_end){
 		/*	Select dt*/
 		calculate_dt(Re, Pr, tau, &dt, dx, dy, imax, jmax, U, V, Flag);
-/*        printf("dt = %f\n", dt);
- */
+		/*        printf("dt = %f\n", dt);
+		 */
 		/*	Set boundary values for u and v according to (14),(15)*/
 		boundaryvalues(imax, jmax, U, V, wl, wr, wt, wb, Flag);
 		/*  Set special boundary values according to the problem*/
 		spec_boundary_val(problem, imax, jmax, U, V);
-        /*	Set boundary values for Temperature*/
-        TEMP_BoundaryCondition( imax, jmax, TEMP, wlt, wrt, wtt, wbt, TL, TR, TB, TT, Flag);
-        /*  Set special temperature boundary values according to the problem*/
-        TEMP_SpecBoundaryCondition( problem, imax, jmax, TEMP);
-        /*  Compute temperature according to (9.20)*/
-        COMP_TEMP(dt, dx, dy, imax, jmax, U, V, F, G, TEMP, Flag, GX, GY, gamma, Re, Pr, beta);
-        
+		/*	Set boundary values for Temperature*/
+		TEMP_BoundaryCondition( imax, jmax, TEMP, wlt, wrt, wtt, wbt, TL, TR, TB, TT, Flag);
+		/*  Set special temperature boundary values according to the problem*/
+		TEMP_SpecBoundaryCondition( problem, imax, jmax, TEMP);
+		/*  Compute temperature according to (9.20)*/
+		COMP_TEMP(dt, dx, dy, imax, jmax, U, V, F, G, TEMP, Flag, GX, GY, gamma, Re, Pr, beta);
+
 		/*	Compute F(n) and G(n) according to (9),(10),(17)*/
 		calculate_fg(Re, GX, GY, alpha, dt, dx, dy, imax, jmax, U, V ,F , G, TEMP, beta, Flag);
 		/*	Compute the right-hand side rs of the pressure equation (11)*/
@@ -164,7 +172,7 @@ int main(int argc, char** argv){
 		/*	Compute u(n+1) and v(n+1) according to (7),(8)*/
 		calculate_uv(dt, dx, dy, imax, jmax, U, V, F, G, P, Flag);
 		/*	Output of u; v; p values for visualization, if necessary*/
-        
+
 		n_div=(int)(dt_value/dt);
 		if(n % n_div == 0){
 			write_vtkFile(problem, n , xlength, ylength, imax, jmax, dx, dy, U, V, P, TEMP, Flag);
@@ -173,14 +181,14 @@ int main(int argc, char** argv){
 		t = t + dt;
 		/*	n := n + 1*/
 		n++;
-        
+
 	}
-    
+
 	/* Destroy memory allocated*/
 	free_matrix(U, 0, imax+1, 0, jmax+1);
 	free_matrix(V, 0, imax+1, 0, jmax+1);
 	free_matrix(P, 0, imax+1, 0, jmax+1);
-    
+
 	free_matrix(RS, 0, imax+1, 0, jmax+1);
 	free_matrix(F, 0, imax+1, 0, jmax+1);
 	free_matrix(G, 0, imax+1, 0, jmax+1);

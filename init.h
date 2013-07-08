@@ -39,80 +39,84 @@
  *                   write into the output file)
  */
 int read_parameters(
-                    double *Re,
-                    double *Pr,
-                    double *beta,
-                    double *UI,
-                    double *VI,
-                    double *PI,
-                    double *TI,
-                    double *GX,
-                    double *GY,
-                    double *t_end,
-                    double *xlength,
-                    double *ylength,
-                    double *dt,
-                    double *dx,
-                    double *dy,
-                    int  *imax,
-                    int  *jmax,
-                    double *alpha,
-                    double *omg,
-                    double *gamma,
-                    double *tau,
-                    int  *itermax,
-                    double *eps,
-                    double *dt_value,
-                    int *wl,
-                    int *wr,
-                    int *wt,
-                    int *wb,
-                    char *problem,
-                    double *lp,
-                    double *rp,
-                    double *dp,
-                    int *wlt,
-                    int *wrt,
-                    int *wtt,
-                    int *wbt,
-                    double *TL,
-                    double *TR,
-                    double *TT,
-                    double *TB,
-                    int argc,
-                    char *argv
-                    );
+		double *Re,
+		double *Pr,
+		double *beta,
+		double *UI,
+		double *VI,
+		double *PI,
+		double *TI,
+		double *GX,
+		double *GY,
+		double *t_end,
+		double *xlength,
+		double *ylength,
+		double *dt,
+		double *dx,
+		double *dy,
+		int  *imax,
+		int  *jmax,
+		double *alpha,
+		double *omg,
+		double *gamma,
+		double *tau,
+		int  *itermax,
+		double *eps,
+		double *dt_value,
+		int *wl,
+		int *wr,
+		int *wt,
+		int *wb,
+		char *problem,
+		double *lp,
+		double *rp,
+		double *dp,
+		int *wlt,
+		int *wrt,
+		int *wtt,
+		int *wbt,
+		double *TL,
+		double *TR,
+		double *TT,
+		double *TB,
+		int argc,
+		char *argv,
+		int *fins,
+		int *finWidth,
+		int *finHeight,
+		int *finDistance
+);
 
 /**
  * The arrays U,V and P are initialized to the constant values UI, VI and PI on
  * the whole domain.
  */
 void init_uvp(
-              double UI,
-              double VI,
-              double PI,
-              double TI,
-              int imax,
-              int jmax,
-              double **U,
-              double **V,
-              double **P,
-              double **T,
-              int **Flag
-              );
+		double UI,
+		double VI,
+		double PI,
+		double TI,
+		int imax,
+		int jmax,
+		double **U,
+		double **V,
+		double **P,
+		double **T,
+		int **Flag
+);
 
 /*The array Flag is initialized with the flags C_F for fluid cells and C_B for obstacle cells as
  specified by the parameter problem. This must be followed by a loop over all cells where
  the boundary cells are marked with the appropriate flags B_xy depending on the direction, in
  which neighboring fluid cells lie.*/
 void init_flag(
-               const char *problem,
-               int imax,
-               int jmax,
-               double lp,
-               double rp,
-               double dp,
-               int **Flag
-               );
+		const char *problem,
+		int imax,
+		int jmax,
+		double lp,
+		double rp,
+		double dp,
+		int **Flag
+);
 #endif
 
