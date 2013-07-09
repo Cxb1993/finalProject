@@ -34,6 +34,7 @@ void TEMP_BoundaryCondition(
                             int imax,
                             int jmax,
                             double **TEMP,
+                            double **TEMP_S,
                             const int wlt,
                             const int wrt,
                             const int wtt,
@@ -42,6 +43,7 @@ void TEMP_BoundaryCondition(
                             const double TR,
                             const double TB,
                             const double TT,
+                            double kratio,
                             int **Flag
                             );
 

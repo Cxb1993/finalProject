@@ -53,6 +53,7 @@ PI		0
 #         initialization temperature
 #--------------------------------------------
 TI		0
+TSI     0
 
 #--------------------------------------------
 #       initialization velocity

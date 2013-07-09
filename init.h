@@ -42,10 +42,12 @@ int read_parameters(
 		double *Re,
 		double *Pr,
 		double *beta,
+        double *kratio,
 		double *UI,
 		double *VI,
 		double *PI,
 		double *TI,
+        double *TSI,
 		double *GX,
 		double *GY,
 		double *t_end,
@@ -92,17 +94,19 @@ int read_parameters(
  * the whole domain.
  */
 void init_uvp(
-		double UI,
-		double VI,
-		double PI,
-		double TI,
-		int imax,
-		int jmax,
-		double **U,
-		double **V,
-		double **P,
-		double **T,
-		int **Flag
+              double UI,
+              double VI,
+              double PI,
+              double TI,
+              double TSI,
+              int imax,
+              int jmax,
+              double **U,
+              double **V,
+              double **P,
+              double **TEMP,
+              double **TEMP_S,
+              int **Flag
 );
 
 /*The array Flag is initialized with the flags C_F for fluid cells and C_B for obstacle cells as

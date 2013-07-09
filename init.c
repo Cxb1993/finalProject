@@ -47,13 +47,16 @@
  * @param argc		 count there is only one input
  */
 
-int read_parameters(double *Re,                /* reynolds number   */
+int read_parameters(
+        double *Re,                /* reynolds number   */
 		double *Pr,                /* prandtl number   */
 		double *beta,              /* coefficient of thermal expansion */
+        double *kratio,            /* Ratio of thermal conductivity of fluid to solid k_f/k_s*/
 		double *UI,                /* velocity x-direction */
 		double *VI,                /* velocity y-direction */
 		double *PI,                /* pressure */
-		double *TI,                /* temperature */
+		double *TI,                /* initial temperature for fluid */
+        double *TSI,                /* initial temperature for solid */
 		double *GX,                /* gravitation x-direction */
 		double *GY,                /* gravitation y-direction */
 		double *t_end,             /* end time */
@@ -69,7 +72,7 @@ int read_parameters(double *Re,                /* reynolds number   */
 		double *gamma,
 		double *tau,               /* safety factor for time step*/
 		int  *itermax,             /* max. number of iterations  */
-		/* for pressure per time step */
+                                    /* for pressure per time step */
 		double *eps,               /* accuracy bound for pressure*/
 		double *dt_value,			/* time for output */
 		int *wl,						/* boundary type for left wall (1:no-slip 2: free-slip 3: outflow) */
@@ -104,9 +107,11 @@ int read_parameters(double *Re,                /* reynolds number   */
 		READ_DOUBLE( szFileName, *xlength );
 		READ_DOUBLE( szFileName, *ylength );
 
-		READ_DOUBLE( szFileName, *Re    );
-		READ_DOUBLE( szFileName, *Pr    );
+		READ_DOUBLE( szFileName, *Re      );
+		READ_DOUBLE( szFileName, *Pr      );
 		READ_DOUBLE( szFileName, *beta    );
+        READ_DOUBLE( szFileName, *kratio  );
+
 
 		READ_DOUBLE( szFileName, *t_end );
 		READ_DOUBLE( szFileName, *dt    );
@@ -130,6 +135,8 @@ int read_parameters(double *Re,                /* reynolds number   */
 		READ_DOUBLE( szFileName, *GY );
 		READ_DOUBLE( szFileName, *PI );
 		READ_DOUBLE( szFileName, *TI );
+        READ_DOUBLE( szFileName, *TSI );
+
 
 		READ_INT( szFileName, *wl );
 		READ_INT( szFileName, *wr );
@@ -184,12 +191,14 @@ void init_uvp(
 		double VI,
 		double PI,
 		double TI,
+        double TSI,
 		int imax,
 		int jmax,
 		double **U,
 		double **V,
 		double **P,
 		double **TEMP,
+        double **TEMP_S,
 		int **Flag
 )
 
@@ -210,15 +219,19 @@ void init_uvp(
 				P[i][j] = PI ;
 				TEMP[i][j] = TI ;
 			}
+            else if ((Flag[i][j]&0)==0){
+                TEMP_S[i][j] = TSI;
+            }
 			else{
 				U[i][j] = 0.0 ;
 				V[i][j] = 0.0 ;
 				P[i][j] = 0.0 ;
 				TEMP[i][j] = 0.0 ;
+                TEMP_S[i][j] = 0.0 ;
 			}
 		}
 	}
-
+    
 }
 
 /* ----------------------------------------------------------------------- */
@@ -241,12 +254,12 @@ void init_flag(
 
 	char image[84];
 	int i, j;
-	int **temp;
+	int **tmp;
 	strcpy(image, problem);
 	strcat(image, ".pgm");
 
-	temp = imatrix(0, imax, 0, jmax);
-	temp = read_pgm(image);
+	tmp = imatrix(0, imax, 0, jmax);
+	tmp = read_pgm(image);
 
 	/* Outer boundaries will always be the same, so we assign those flags first*/
 	/* Corners: */
@@ -261,7 +274,7 @@ void init_flag(
 
 	/* Left boundary: */
 	for(j = 1; j < jmax + 1; j++){
-		if((temp[1][j] & B_C)){
+		if((tmp[1][j] & B_C)){
 			Flag[0][j] = B_O;
 		}
 		/*
@@ -276,7 +289,7 @@ void init_flag(
 
 	/* Right boundary: */
 	for(j = 1; j < jmax + 1; j++){
-		if((temp[imax][j] & B_C)){
+		if((tmp[imax][j] & B_C)){
 			Flag[imax+1][j] = B_W;
 		}
 		/*
@@ -289,13 +302,13 @@ void init_flag(
 
 	/* Top boundary: */
 	for(i = 1; i < imax + 1; i++){
-		if((temp[i][jmax] & B_C)){
+		if((tmp[i][jmax] & B_C)){
 			Flag[i][jmax+1] = B_S;
 		}	}
 
 	/* Bottom boundary: */
 	for(i = 1; i < imax + 1; i++){
-		if((temp[i][1] & B_C)){
+		if((tmp[i][1] & B_C)){
 			Flag[i][0] = B_N;
 		}
 	}
@@ -306,22 +319,22 @@ void init_flag(
 	 * */
 	for(i = 1; i < imax + 1; i++){
 		for(j = 1; j < jmax + 1; j++){
-			if(temp[i][j]==C_F){
+			if(tmp[i][j]==C_F){
 				Flag[i][j] = B_C;
 			}
 			else{
 				Flag[i][j] = 0;
 			}
-			if((temp[i-1][j]&B_C)==B_C||(temp[i-1][j]&C_F)==C_F){
+			if((tmp[i-1][j]&B_C)==B_C||(tmp[i-1][j]&C_F)==C_F){
 				Flag[i][j] |= B_W;
 			}
-			if((temp[i+1][j]&B_C)==B_C||(temp[i+1][j]&C_F)==C_F){
+			if((tmp[i+1][j]&B_C)==B_C||(tmp[i+1][j]&C_F)==C_F){
 				Flag[i][j] |= B_O;
 			}
-			if((temp[i][j+1]&B_C)==B_C||(temp[i][j+1]&C_F)==C_F){
+			if((tmp[i][j+1]&B_C)==B_C||(tmp[i][j+1]&C_F)==C_F){
 				Flag[i][j] |= B_N;
 			}
-			if((temp[i][j-1]&B_C)==B_C||(temp[i][j-1]&C_F)==C_F){
+			if((tmp[i][j-1]&B_C)==B_C||(tmp[i][j-1]&C_F)==C_F){
 				Flag[i][j] |= B_S;
 			}
 			/*
@@ -332,7 +345,7 @@ void init_flag(
 			}
 		}
 	}
-	free_imatrix(temp, 0, imax, 0, jmax);
+	free_imatrix(tmp, 0, imax, 0, jmax);
 }
 
 

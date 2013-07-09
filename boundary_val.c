@@ -243,6 +243,7 @@ void TEMP_BoundaryCondition(
                             int imax,
                             int jmax,
                             double **TEMP,
+                            double **TEMP_S,
                             const int wlt,
                             const int wrt,
                             const int wtt,
@@ -251,6 +252,7 @@ void TEMP_BoundaryCondition(
                             const double TR,
                             const double TB,
                             const double TT,
+                            double kratio,
                             int **Flag
                             ) {
     /* Set values for all the outside boundary depending on the value that
@@ -325,6 +327,43 @@ void TEMP_BoundaryCondition(
 	}
     
     /*treatment in case we have boundary inside*/
+    /**
+	 * Loop to check for boundary cells in the inner domain, and assign
+	 * correct values of T.
+	 */
+	for(i = 1; i < imax+1; i++){
+		for(j = 1; j < jmax+1; j++){
+            /*
+			 * If it's not a fluid cell but it has fluid cell neighbors, some values must still
+			 * be calculated using the boundary flags.
+			 */
+			if((Flag[i][j]&31)==B_N){
+				TEMP[i][j] = ( (kratio-1)*TEMP[i][j+1] + 2*TEMP_S[i][j] ) / (1+kratio);
+			}
+			else if((Flag[i][j]&31)==B_S){
+				TEMP[i][j]=( (kratio-1)*TEMP[i][j-1] + 2*TEMP_S[i][j] ) / (1+kratio);
+			}
+			else if((Flag[i][j]&31)==B_W){
+				TEMP[i][j]=( (kratio-1)*TEMP[i-1][j] + 2*TEMP_S[i][j] ) / (1+kratio);
+			}
+			else if((Flag[i][j]&31)==B_O){
+				TEMP[i][j]=( (kratio-1)*TEMP[i+1][j] + 2*TEMP_S[i][j] ) / (1+kratio);
+			}
+			else if((Flag[i][j]&31)==B_NO){
+				TEMP[i][j]= ( ( (kratio-1)*TEMP[i][j+1] + 2*TEMP_S[i][j] ) / (1+kratio) + ( (kratio-1)*TEMP[i+1][j] + 2*TEMP_S[i][j] ) / (1+kratio) ) / 2;
+			}
+			else if((Flag[i][j]&31)==B_NW){
+				TEMP[i][j]= ( ( (kratio-1)*TEMP[i][j+1] + 2*TEMP_S[i][j] ) / (1+kratio) + ( (kratio-1)*TEMP[i-1][j] + 2*TEMP_S[i][j] ) / (1+kratio) ) / 2;
+			}
+			else if((Flag[i][j]&31)==B_SO){
+				TEMP[i][j]= ( ( (kratio-1)*TEMP[i][j-1] + 2*TEMP_S[i][j] ) / (1+kratio) + ( (kratio-1)*TEMP[i+1][j] + 2*TEMP_S[i][j] ) / (1+kratio) ) / 2;
+			}
+			else if((Flag[i][j]&31)==B_SW){
+				TEMP[i][j]= ( ( (kratio-1)*TEMP[i][j-1] + 2*TEMP_S[i][j] ) / (1+kratio) + ( (kratio-1)*TEMP[i-1][j] + 2*TEMP_S[i][j] ) / (1+kratio) ) / 2;;
+			}
+        }
+	}
+    
 }
 
 void TEMP_SpecBoundaryCondition(

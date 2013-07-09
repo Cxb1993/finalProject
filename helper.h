@@ -44,15 +44,25 @@
 /**
  * Boundary cell classification |center|east|west|south|north| (1 = fluid)
  */
-#define B_N 1 	/* 0b0000001*/
-#define B_S 2	/* 0b0000010*/
-#define B_W 4	/* 0b0000100*/
-#define B_O 8	/* 0b0001000*/
-#define B_C 16	/* 0b0010000*/
-#define B_NW 5	/* 0b0000101*/
-#define B_NO 9	/* 0b0001001*/
-#define B_SW 6	/* 0b0000110*/
-#define B_SO 10	/* 0b0001010*/
+#define B_N 1       /* 0b0000001*/
+#define B_S 2       /* 0b0000010*/
+#define B_W 4       /* 0b0000100*/
+#define B_O 8       /* 0b0001000*/
+#define B_C 16      /* 0b0010000*/
+#define B_NW 5      /* 0b0000101*/
+#define B_NO 9      /* 0b0001001*/
+#define B_SW 6      /* 0b0000110*/
+#define B_SO 10     /* 0b0001010*/
+
+
+#define BS_N 30     /* 0b0011110*/
+#define BS_S 29     /* 0b0011101*/
+#define BS_W 27     /* 0b0011011*/
+#define BS_O 23     /* 0b0010111*/
+#define BS_NW 26    /* 0b0011010*/
+#define BS_NO 22    /* 0b0010110*/
+#define BS_SW 25    /* 0b0011001*/
+#define BS_SO 21    /* 0b0010101*/
 
 /**
  * Boundary cells

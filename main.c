@@ -48,40 +48,42 @@
  */
 int main(int argc, char** argv){
 	/*Geometry data*/
-	double xlength;		 /*domain size in x-direction*/
+	double xlength;		/*domain size in x-direction*/
 	double ylength;		/*domain size in y-direction*/
 	/* The computational domain is thus = [0; xlaenge] X [0; ylaenge].*/
-	int imax;		/* number of interior cells in x-direction*/
-	int jmax;		/* number of interior cells in y-direction*/
-	double dx;		/* length dx of one cell in x-direction*/
-	double dy;		/* length dy of one cell in y-direction*/
+	int imax;           /* number of interior cells in x-direction*/
+	int jmax;           /* number of interior cells in y-direction*/
+	double dx;          /* length dx of one cell in x-direction*/
+	double dy;          /* length dy of one cell in y-direction*/
 	/* Time-stepping data:*/
-	double t;		/* current time value*/
+	double t;           /* current time value*/
 	double t_end;		/* final time tend*/
-	double dt;		/* time step size dt*/
-	double tau;		/* safety factor for time step size control T*/
+	double dt;          /* time step size dt*/
+	double tau;         /* safety factor for time step size control T*/
 	double dt_value;	/* time interval for writing visualization data in a file*/
-	int n;			/* current time iteration step*/
+	int n;              /* current time iteration step*/
 	/* Pressure iteration data:*/
 	int itermax;		/* maximum number of pressure iterations in one time step*/
-	int it;			/* SOR iteration counter*/
-	double res;		/* residual norm of the pressure equation*/
-	double eps;		/* accuracy criterion epsilon (tolerance) for pressure iteration (res < eps)*/
-	double omg;		/* relaxation factor omega for SOR iteration*/
-	double gamma;
+	int it;             /* SOR iteration counter*/
+	double res;         /* residual norm of the pressure equation*/
+	double eps;         /* accuracy criterion epsilon (tolerance) for pressure iteration (res < eps)*/
+	double omg;         /* relaxation factor omega for SOR iteration*/
+	double gamma;       /* upwind differencing factor gamma for temperature */
 	double alpha;		/* upwind differencing factor alpha (see equation (4))*/
 	/* Problem-dependent quantities:*/
-	double Re;		/* Reynolds number Re*/
-	double Pr;
-	double beta;
+	double Re;          /* Reynolds number Re*/
+	double Pr;          /* Prandtl number Pr*/
+	double beta;        /* coefficient of thermal expansion beta*/
+    double kratio;      /* Ratio of thermal conductivity of fluid to solid k_f/k_s*/
 	double GX,GY;		/* external forces gx; gy, e.g. gravity*/
-	double UI,VI,PI,TI;	/* initial data for velocities and pressure*/
+	double UI,VI,PI,TI,TSI;	/* initial data for velocities and pressure*/
 
 	/* Arrays*/
 	double **U;			/* velocity in x-direction*/
 	double **V;			/* velocity in y-direction*/
 	double **P;			/* pressure*/
-	double **TEMP;			/* temperature*/
+	double **TEMP;		/* temperature for fluid*/
+    double **TEMP_S;    /* temperature for solid*/
 	double **RS;		/* right-hand side for pressure iteration*/
 	double **F,**G;		/* F;G*/
 	int **Flag; 		/* Flag field used to classify fluid cells*/
@@ -90,10 +92,10 @@ int main(int argc, char** argv){
 	int wr;				/* boundary type for right wall (1:no-slip 2: free-slip 3: outflow) */
 	int wt;				/* boundary type for top wall (1:no-slip 2: free-slip 3: outflow) */
 	int wb;				/* boundary type for bottom wall (1:no-slip 2: free-slip 3: outflow) */
-	int wlt;				/* boundary type for left wall (1:set_temperature 2: adiabatic) */
-	int wrt;				/* boundary type for right wall (1:set_temperature 2: adiabatic) */
-	int wtt;				/* boundary type for top wall (1:set_temperature 2: adiabatic) */
-	int wbt;				/* boundary type for bottom wall (1:set_temperature 2: adiabatic) */
+	int wlt;			/* boundary type for left wall (1:set_temperature 2: adiabatic) */
+	int wrt;			/* boundary type for right wall (1:set_temperature 2: adiabatic) */
+	int wtt;			/* boundary type for top wall (1:set_temperature 2: adiabatic) */
+	int wbt;			/* boundary type for bottom wall (1:set_temperature 2: adiabatic) */
 	double TL,TR,TB,TT; /* Temperature in all boundaries */
 	double lp;			/* pressure in left boundary */
 	double rp;			/* pressure in right boundary */
@@ -107,7 +109,7 @@ int main(int argc, char** argv){
 	int finDistance;
 
 	/* read the program configuration file using read_parameters()*/
-	read_parameters(&Re, &Pr, &beta, &UI, &VI, &PI, &TI, &GX, &GY, &t_end, &xlength, &ylength, &dt, &dx, &dy, &imax,
+	read_parameters(&Re, &Pr, &beta, &kratio, &UI, &VI, &PI, &TI, &TSI, &GX, &GY, &t_end, &xlength, &ylength, &dt, &dx, &dy, &imax,
 			&jmax, &alpha, &omg, &gamma, &tau, &itermax, &eps, &dt_value, &wl, &wr, &wt, &wb, problem, &lp, &rp, &dp,
 			&wlt, &wrt, &wtt, &wbt, &TL, &TR, &TT, &TB, argc, argv[1],&fins, &finWidth, &finHeight, &finDistance);
 
@@ -116,6 +118,7 @@ int main(int argc, char** argv){
 	V = matrix(0, imax+1, 0, jmax+1);
 	P = matrix(0, imax+1, 0, jmax+1);
 	TEMP = matrix(0, imax+1, 0, jmax+1);
+    TEMP_S = matrix(0, imax+1, 0, jmax+1);
 	RS = matrix(0, imax+1, 0, jmax+1);
 	F = matrix(0, imax+1, 0, jmax+1);
 	G = matrix(0, imax+1, 0, jmax+1);
@@ -130,30 +133,32 @@ int main(int argc, char** argv){
 	strcat(pgmFile, ".pgm");
 	/* create the initial setup init_uvp()*/
 	create_geometry(pgmFile, imax, jmax, dx, dy, fins, finWidth, finHeight, finDistance);
-	init_flag(problem, imax, jmax, lp, rp, dp, Flag); /*Didn't do this yet*/
-	init_uvp(UI, VI, PI, TI, imax, jmax, U, V, P, TEMP, Flag);
+	init_flag(problem, imax, jmax, lp, rp, dp, Flag);
+	init_uvp(UI, VI, PI, TI, TSI, imax, jmax, U, V, P, TEMP, TEMP_S, Flag);
 
 	/* ----------------------------------------------------------------------- */
 	/*                             Performing the main loop                    */
 	/* ----------------------------------------------------------------------- */
 
-	/* Upperbound t_end+dt/10 to be sure that it runs for t=t_end */
-	while (t<t_end){
+	while (t<=t_end){
+        /*solid solver*/
+        
+        
+        
+        
+        /*fluid solver*/
 		/*	Select dt*/
 		calculate_dt(Re, Pr, tau, &dt, dx, dy, imax, jmax, U, V, Flag);
-		/*        printf("dt = %f\n", dt);
-		 */
 		/*	Set boundary values for u and v according to (14),(15)*/
 		boundaryvalues(imax, jmax, U, V, wl, wr, wt, wb, Flag);
 		/*  Set special boundary values according to the problem*/
 		spec_boundary_val(problem, imax, jmax, U, V);
 		/*	Set boundary values for Temperature*/
-		TEMP_BoundaryCondition( imax, jmax, TEMP, wlt, wrt, wtt, wbt, TL, TR, TB, TT, Flag);
+		TEMP_BoundaryCondition( imax, jmax, TEMP, TEMP_S, wlt, wrt, wtt, wbt, TL, TR, TB, TT, kratio, Flag);
 		/*  Set special temperature boundary values according to the problem*/
 		TEMP_SpecBoundaryCondition( problem, imax, jmax, TEMP);
 		/*  Compute temperature according to (9.20)*/
 		COMP_TEMP(dt, dx, dy, imax, jmax, U, V, F, G, TEMP, Flag, GX, GY, gamma, Re, Pr, beta);
-
 		/*	Compute F(n) and G(n) according to (9),(10),(17)*/
 		calculate_fg(Re, GX, GY, alpha, dt, dx, dy, imax, jmax, U, V ,F , G, TEMP, beta, Flag);
 		/*	Compute the right-hand side rs of the pressure equation (11)*/
