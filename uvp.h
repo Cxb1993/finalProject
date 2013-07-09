@@ -73,6 +73,7 @@ void calculate_rs(
 void calculate_dt(
                   double Re,
                   double Pr,
+                  double Kappa,
                   double tau,
                   double *dt,
                   double dx,
@@ -131,5 +132,17 @@ void COMP_TEMP(
                double Pr,
                double beta
                );
+
+void COMP_TEMP_Solid(
+                     double dt,
+                     double dx,
+                     double dy,
+                     int imax,
+                     int jmax,
+                     double **TEMP,
+                     double **TEMP_S,
+                     int **Flag,
+                     double Kappa
+                     );
 
 #endif

@@ -52,6 +52,7 @@ int read_parameters(
 		double *Pr,                /* prandtl number   */
 		double *beta,              /* coefficient of thermal expansion */
         double *kratio,            /* Ratio of thermal conductivity of fluid to solid k_f/k_s*/
+        double *Kappa,             /* coefficient of thermal diffusivity */
 		double *UI,                /* velocity x-direction */
 		double *VI,                /* velocity y-direction */
 		double *PI,                /* pressure */
@@ -89,8 +90,12 @@ int read_parameters(
 		int *wbt,
 		double *TL,
 		double *TR,
-		double *TT,
 		double *TB,
+		double *TT,
+        double *QL,
+        double *QR,
+        double *QB,
+        double *QT,
 		int argc,
 		char *argv,
 		int *fins,
@@ -111,6 +116,8 @@ int read_parameters(
 		READ_DOUBLE( szFileName, *Pr      );
 		READ_DOUBLE( szFileName, *beta    );
         READ_DOUBLE( szFileName, *kratio  );
+        READ_DOUBLE( szFileName, *Kappa   );
+
 
 
 		READ_DOUBLE( szFileName, *t_end );

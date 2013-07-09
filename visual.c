@@ -14,7 +14,8 @@ void write_vtkFile(const char *szProblem,
 		double **U,
 		double **V,
 		double **P,
-                   double **TEMP,
+        double **TEMP,
+        double **TEMP_S,
 		int **Flag
 ) {
 
@@ -64,7 +65,12 @@ void write_vtkFile(const char *szProblem,
     fprintf(fp, "LOOKUP_TABLE default \n");
     for(j = 1; j < jmax+1; j++) {
         for(i = 1; i < imax+1; i++) {
-            fprintf(fp, "%f\n", TEMP[i][j] );
+            if (( Flag[i][j]&B_C ) != B_C ){
+            fprintf(fp, "%f\n", TEMP_S[i][j] );
+            }
+            else{
+                fprintf(fp, "%f\n", TEMP[i][j] );
+            }
         }
     }
  

@@ -31,8 +31,8 @@
 /**
  * Define boundary conditions for temperature
  */
-#define SET_TEMP 1
-#define ADIABATIC 2
+#define Dirichlet   1
+#define Neumann     2
 
 
 /**

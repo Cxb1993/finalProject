@@ -75,6 +75,7 @@ int main(int argc, char** argv){
 	double Pr;          /* Prandtl number Pr*/
 	double beta;        /* coefficient of thermal expansion beta*/
     double kratio;      /* Ratio of thermal conductivity of fluid to solid k_f/k_s*/
+    double Kappa;       /* coefficient of thermal diffusivity*/
 	double GX,GY;		/* external forces gx; gy, e.g. gravity*/
 	double UI,VI,PI,TI,TSI;	/* initial data for velocities and pressure*/
 
@@ -97,6 +98,7 @@ int main(int argc, char** argv){
 	int wtt;			/* boundary type for top wall (1:set_temperature 2: adiabatic) */
 	int wbt;			/* boundary type for bottom wall (1:set_temperature 2: adiabatic) */
 	double TL,TR,TB,TT; /* Temperature in all boundaries */
+    double QL,QR,QB,QT; /* Heat flux in all boundaries */
 	double lp;			/* pressure in left boundary */
 	double rp;			/* pressure in right boundary */
 	double dp;          /* change in pressure with right boundary = 0 */
@@ -109,9 +111,9 @@ int main(int argc, char** argv){
 	int finDistance;
 
 	/* read the program configuration file using read_parameters()*/
-	read_parameters(&Re, &Pr, &beta, &kratio, &UI, &VI, &PI, &TI, &TSI, &GX, &GY, &t_end, &xlength, &ylength, &dt, &dx, &dy, &imax,
+	read_parameters(&Re, &Pr, &beta, &kratio, &Kappa, &UI, &VI, &PI, &TI, &TSI, &GX, &GY, &t_end, &xlength, &ylength, &dt, &dx, &dy, &imax,
 			&jmax, &alpha, &omg, &gamma, &tau, &itermax, &eps, &dt_value, &wl, &wr, &wt, &wb, problem, &lp, &rp, &dp,
-			&wlt, &wrt, &wtt, &wbt, &TL, &TR, &TT, &TB, argc, argv[1],&fins, &finWidth, &finHeight, &finDistance);
+			&wlt, &wrt, &wtt, &wbt, &TL, &TR, &TB, &TT, &QL, &QR, &QB, &QT, argc, argv[1],&fins, &finWidth, &finHeight, &finDistance);
 
 	/* set up the matrices (arrays) needed using the matrix() command*/
 	U = matrix(0, imax+1, 0, jmax+1);
@@ -141,22 +143,26 @@ int main(int argc, char** argv){
 	/* ----------------------------------------------------------------------- */
 
 	while (t<=t_end){
+		/*	Select dt*/
+		calculate_dt(Re, Pr, Kappa, tau, &dt, dx, dy, imax, jmax, U, V, Flag);
+        
         /*solid solver*/
-        
-        
-        
+		/*	Set boundary values for Temperature for solid*/
+		TEMP_BoundaryCondition_Solid( dx, dy, imax, jmax, TEMP, TEMP_S, wlt, wrt, wtt, wbt, TL, TR, TB, TT, QL, QR, QB, QT, kratio, Flag);
+		/*  Set special temperature boundary values according to the problem for solid*/
+		TEMP_SpecBoundaryCondition_Solid( problem, imax, jmax, TEMP_S, Flag);
+		/*  Compute temperature for solid*/
+        COMP_TEMP_Solid(dt, dx, dy, imax, jmax, TEMP, TEMP_S, Flag, Kappa);
         
         /*fluid solver*/
-		/*	Select dt*/
-		calculate_dt(Re, Pr, tau, &dt, dx, dy, imax, jmax, U, V, Flag);
 		/*	Set boundary values for u and v according to (14),(15)*/
 		boundaryvalues(imax, jmax, U, V, wl, wr, wt, wb, Flag);
 		/*  Set special boundary values according to the problem*/
 		spec_boundary_val(problem, imax, jmax, U, V);
 		/*	Set boundary values for Temperature*/
-		TEMP_BoundaryCondition( imax, jmax, TEMP, TEMP_S, wlt, wrt, wtt, wbt, TL, TR, TB, TT, kratio, Flag);
+		TEMP_BoundaryCondition( dx,dy,imax, jmax, TEMP, TEMP_S, wlt, wrt, wtt, wbt, TL, TR, TB, TT, QL, QR, QB, QT, kratio, Flag);
 		/*  Set special temperature boundary values according to the problem*/
-		TEMP_SpecBoundaryCondition( problem, imax, jmax, TEMP);
+		TEMP_SpecBoundaryCondition( problem, imax, jmax, TEMP, Flag);
 		/*  Compute temperature according to (9.20)*/
 		COMP_TEMP(dt, dx, dy, imax, jmax, U, V, F, G, TEMP, Flag, GX, GY, gamma, Re, Pr, beta);
 		/*	Compute F(n) and G(n) according to (9),(10),(17)*/
@@ -180,7 +186,7 @@ int main(int argc, char** argv){
 
 		n_div=(int)(dt_value/dt);
 		if(n % n_div == 0){
-			write_vtkFile(problem, n , xlength, ylength, imax, jmax, dx, dy, U, V, P, TEMP, Flag);
+			write_vtkFile(problem, n , xlength, ylength, imax, jmax, dx, dy, U, V, P, TEMP, TEMP_S , Flag);
 		}
 		/*	t := t + dt*/
 		t = t + dt;

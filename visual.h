@@ -33,7 +33,7 @@ void write_vtkFile(const char *szProblem,
                    double **V,
                    double **P,
                    double **TEMP,
-                   
+                   double **TEMP_S,
                    int **Flag);
 
 /**

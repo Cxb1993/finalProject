@@ -199,6 +199,7 @@ void calculate_rs(
 void calculate_dt(
                   double Re,
                   double Pr,
+                  double Kappa,
                   double tau,
                   double *dt,
                   double dx,
@@ -211,7 +212,7 @@ void calculate_dt(
                   ) {
 	/*calculates maximum absolute velocities in x and y direction*/
 	double umax=0, vmax=0;
-	double a,b,c,d;
+	double a,b,c,d,e;
 	int i, j;
 	for(i = 1; i <= imax; i++) {
 		for(j = 1; j<=jmax; j++) {
@@ -232,17 +233,21 @@ void calculate_dt(
 		b = dx/umax;
 		c = dy/vmax;
         d = Pr*Re/(2.0*(1.0/(dx*dx)+1.0/(dy*dy)));
-		if     (a < b && a < c && a < d){
+        e = (1/Kappa)/(2.0*(1.0/(dx*dx)+1.0/(dy*dy)));
+		if     (a <= b && a <= c && a <= d && a <= e){
 			*dt = tau * a;
 		}
-		else if(b < a && b < c && b < d){
+		else if (b <= a && b <= c && b <= d && b <= e){
 			*dt = tau * b;
 		}
-		else if(c < a && c < b && c < d){
+		else if (c <= a && c <= b && c <= d && c <= e){
 			*dt = tau * c;
 		}
-        else{
+        else if (d <= a && d <= b && d <= c && d <= e){
             *dt = tau * d;
+        }
+        else {
+            *dt = tau * e;
         }
 	}
 }
@@ -345,7 +350,7 @@ void calculate_uv(
 
 
 /* ----------------------------------------------------------------------- */
-/*                             Function Compute temperatue                 */
+/*                             Function Compute temperatue (Fluid)         */
 /* ----------------------------------------------------------------------- */
 
 void COMP_TEMP(
@@ -400,5 +405,38 @@ void COMP_TEMP(
 			}
         }
     }
+}
+
+/* ----------------------------------------------------------------------- */
+/*                             Function Compute temperatue (Soild)         */
+/* ----------------------------------------------------------------------- */
+
+void COMP_TEMP_Solid(
+               double dt,
+               double dx,
+               double dy,
+               int imax,
+               int jmax,
+               double **TEMP,
+               double **TEMP_S,
+               int **Flag,
+               double Kappa
+               ){
+    int i ;
+	int j ;
+    
+    for ( i = 1 ; i <= imax ; i++ )
+	{
+		for( j = 1 ; j <= jmax ; j++ )
+		{
+			/*
+			 * We need to check that the cell is actually a solid cell.
+			 */
+            if( ( ( Flag[i][j]&B_C ) != B_C ) ){
+                TEMP_S[i][j]= ( 1-2*Kappa*dt*(1/(dx*dx) + 1/(dy*dy)) )*TEMP_S[i][j] + Kappa*dt/(dx*dx)*( TEMP_S[i+1][j] + TEMP_S[i-1][j] ) + Kappa*dt/(dy*dy)*( TEMP_S[i][j+1] + TEMP_S[i][j-1] );
+            }
+        }
+    }
+ 
 }
 
