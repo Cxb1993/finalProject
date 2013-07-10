@@ -69,7 +69,7 @@ void create_geometry(
 					}
 				}
 			}
-			for(i = start; i < end; i++){
+			for(i = start+1; i < end+1; i++){
 				for(j = 0; j < finCore; j++){
 					Geometry[i][j]= 0;
 				}
