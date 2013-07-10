@@ -161,7 +161,11 @@ int read_parameters(
 		READ_DOUBLE( szFileName, *TB );
 		READ_DOUBLE( szFileName, *TT );
 
-
+		READ_DOUBLE( szFileName, *QL );
+		READ_DOUBLE( szFileName, *QR );
+		READ_DOUBLE( szFileName, *QB );
+		READ_DOUBLE( szFileName, *QT );
+        
 		strcpy(problem, argv);
 
 		READ_DOUBLE ( szFileName, *lp );

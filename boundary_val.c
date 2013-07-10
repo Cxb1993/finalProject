@@ -277,7 +277,7 @@ void TEMP_BoundaryCondition(
         case Neumann:
             for (j = 0; j <= jmax + 1; j++){
                 if (( Flag[1][j]&B_C ) == B_C ){
-                TEMP[0][j] = TEMP[1][j]-QL*dx;
+                TEMP[0][j] = TEMP[1][j]+QL*dx;
                 }
             }
             break;
@@ -314,7 +314,7 @@ void TEMP_BoundaryCondition(
         case Neumann:
             for (i = 0; i <= imax + 1; i++){
                 if (( Flag[i][jmax]&B_C ) == B_C ){
-                    TEMP[i][jmax+1] = TEMP[i][jmax]-QT*dx;
+                    TEMP[i][jmax+1] = TEMP[i][jmax]-QT*dy;
                 }
             }
             break;
@@ -332,7 +332,7 @@ void TEMP_BoundaryCondition(
         case Neumann:
             for (i = 0; i <= imax + 1; i++){
                 if (( Flag[i][1]&B_C ) == B_C ){
-                    TEMP[i][0] = TEMP[i][1]-QB*dx;
+                    TEMP[i][0] = TEMP[i][1]+QB*dy;
                 }
             }
             break;
@@ -437,7 +437,7 @@ void TEMP_BoundaryCondition_Solid(
                             int **Flag
                             ) {
     /* Set values for all the outside boundary depending on the value that
-	 * the data file is set to. Temperature = 1 and Adiabatic = 2
+	 * the data file is set to. Dirichlet = 1 and Neumann = 2
      * We start with the left boundary. */
 	int i,j;
     
@@ -451,7 +451,7 @@ void TEMP_BoundaryCondition_Solid(
         case Neumann:
             for (j = 0; j <= jmax + 1; j++){
                 if (( Flag[1][j]&B_C ) != B_C ){
-                    TEMP_S[0][j] = TEMP_S[1][j]-QL*kratio*dx;
+                    TEMP_S[0][j] = TEMP_S[1][j]+QL*kratio*dx;
                 }
             }
             break;
@@ -488,7 +488,7 @@ void TEMP_BoundaryCondition_Solid(
         case Neumann:
             for (i = 0; i <= imax + 1; i++){
                 if (( Flag[i][jmax]&B_C ) != B_C ){
-                    TEMP_S[i][jmax+1] = TEMP_S[i][jmax]-QT*kratio*dx;
+                    TEMP_S[i][jmax+1] = TEMP_S[i][jmax]-QT*kratio*dy;
                 }
             }
             break;
@@ -506,7 +506,7 @@ void TEMP_BoundaryCondition_Solid(
         case Neumann:
             for (i = 0; i <= imax + 1; i++){
                 if (( Flag[i][1]&B_C ) != B_C ){
-                    TEMP_S[i][0] = TEMP_S[i][1]-QB*kratio*dx;
+                    TEMP_S[i][0] = TEMP_S[i][1]+QB*kratio*dy;
                 }
             }
             break;

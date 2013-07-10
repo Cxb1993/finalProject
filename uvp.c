@@ -299,7 +299,7 @@ void calculate_uv(
 					V[i][j] = G[i][j]-(dt/dy)*(P[i][j+1]-P[i][j]);
 				}
 			}
-			else if((Flag[i][j]&31)==B_N){
+/*			else if((Flag[i][j]&31)==B_N){
 				V[i][j]=0;
 				U[i-1][j]=-1*U[i-1][j+1];
 				U[i][j]=-1*U[i][j+1];
@@ -343,7 +343,7 @@ void calculate_uv(
 				V[i][j]=-1*V[i-1][j];
 				V[i][j-1]=0;
 			}
-
+*/
 		}
 	}
 }
