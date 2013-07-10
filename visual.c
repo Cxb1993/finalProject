@@ -83,6 +83,23 @@ void write_vtkFile(const char *szProblem,
 		}
 	}
 
+    fprintf(fp,"\n");
+	fprintf(fp, "SCALARS media int 1 \n");
+	fprintf(fp, "LOOKUP_TABLE default \n");
+	for(j = 1; j < jmax+1; j++) {
+		for(i = 1; i < imax+1; i++) {
+            if (( Flag[i][j]&B_C ) != B_C ){
+                fprintf(fp, "%i\n", 1 );
+            }
+            else{
+                fprintf(fp, "%i\n", 0 );
+            }
+
+		}
+	}
+
+    
+    
 	if( fclose(fp) )
 	{
         char szBuff[200];

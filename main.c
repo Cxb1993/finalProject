@@ -187,6 +187,10 @@ int main(int argc, char** argv){
 		}
 		/*	Compute u(n+1) and v(n+1) according to (7),(8)*/
 		calculate_uv(dt, dx, dy, imax, jmax, U, V, F, G, P, Flag);
+        /*	Set boundary values for u and v according to (14),(15)*/
+		boundaryvalues(imax, jmax, U, V, wl, wr, wt, wb, Flag);
+		/*  Set special boundary values according to the problem*/
+		spec_boundary_val(problem, imax, jmax, U, V);
 		/*	Output of u; v; p values for visualization, if necessary*/
 		n_div=(int)(dt_value/dt);
 		if(n % n_div == 0){
