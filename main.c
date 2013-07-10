@@ -109,11 +109,12 @@ int main(int argc, char** argv){
 	int finWidth;
 	int finHeight;
 	int finDistance;
+	int finCore;
 
 	/* read the program configuration file using read_parameters()*/
 	read_parameters(&Re, &Pr, &beta, &kratio, &Kappa, &UI, &VI, &PI, &TI, &TSI, &GX, &GY, &t_end, &xlength, &ylength, &dt, &dx, &dy, &imax,
 			&jmax, &alpha, &omg, &gamma, &tau, &itermax, &eps, &dt_value, &wl, &wr, &wt, &wb, problem, &lp, &rp, &dp,
-			&wlt, &wrt, &wtt, &wbt, &TL, &TR, &TB, &TT, &QL, &QR, &QB, &QT, argc, argv[1],&fins, &finWidth, &finHeight, &finDistance);
+			&wlt, &wrt, &wtt, &wbt, &TL, &TR, &TB, &TT, &QL, &QR, &QB, &QT, argc, argv[1],&fins, &finWidth, &finHeight, &finDistance, &finCore);
 
 	/* set up the matrices (arrays) needed using the matrix() command*/
 	U = matrix(0, imax+1, 0, jmax+1);
@@ -134,7 +135,12 @@ int main(int argc, char** argv){
 	strcpy(pgmFile, argv[1]);
 	strcat(pgmFile, ".pgm");
 	/* create the initial setup init_uvp()*/
-	create_geometry(pgmFile, imax, jmax, dx, dy, fins, finWidth, finHeight, finDistance);
+	if(strcmp(argv[2],"vertical")==0){
+	create_geometry(pgmFile, imax, jmax, dx, dy, fins, finWidth, finHeight, finDistance, finCore, vertical);
+	}
+	else{
+		create_geometry(pgmFile, imax, jmax, dx, dy, fins, finWidth, finHeight, finDistance, finCore, horizontal);
+	}
 	init_flag(problem, imax, jmax, lp, rp, dp, Flag);
 	init_uvp(UI, VI, PI, TI, TSI, imax, jmax, U, V, P, TEMP, TEMP_S, Flag);
 

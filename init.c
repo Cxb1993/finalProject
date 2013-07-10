@@ -101,14 +101,15 @@ int read_parameters(
 		int *fins,
 		int *finWidth,
 		int *finHeight,
-		int *finDistance
+		int *finDistance,
+		int *finCore
 )
 {
 	char szFileName[200];
 	strcpy(szFileName, argv);
 	strcat(szFileName, ".dat");
 
-	if(argc==2){
+	if(argc<4){
 		READ_DOUBLE( szFileName, *xlength );
 		READ_DOUBLE( szFileName, *ylength );
 
@@ -171,6 +172,7 @@ int read_parameters(
 		READ_INT( szFileName, *finWidth);
 		READ_INT( szFileName, *finHeight );
 		READ_INT( szFileName, *finDistance );
+		READ_INT( szFileName, *finCore );
 
 		*dx = *xlength / (double)(*imax);
 		*dy = *ylength / (double)(*jmax);

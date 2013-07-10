@@ -91,7 +91,8 @@ int read_parameters(
 		int *fins,
 		int *finWidth,
 		int *finHeight,
-		int *finDistance
+		int *finDistance,
+		int *finCore
 );
 
 /**

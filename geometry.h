@@ -13,7 +13,9 @@ void create_geometry(
 		int fins,
 		int finWidth,
 		int finHeight,
-		int finDistance
+		int finDistance,
+		int finCore,
+		int option
 );
 
 #endif /* GEOMETRY_H_ */

@@ -64,6 +64,9 @@
 #define BS_SW 25    /* 0b0011001*/
 #define BS_SO 21    /* 0b0010101*/
 
+#define vertical 1
+#define horizontal 0
+
 /**
  * Boundary cells
  */
