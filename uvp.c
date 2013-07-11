@@ -236,18 +236,25 @@ void calculate_dt(
         e = (1/Kappa)/(2.0*(1.0/(dx*dx)+1.0/(dy*dy)));
 		if     (a <= b && a <= c && a <= d && a <= e){
 			*dt = tau * a;
+            printf("dt_a = %f \n", *dt);
+
 		}
 		else if (b <= a && b <= c && b <= d && b <= e){
 			*dt = tau * b;
+            printf("dt_b = %f \n", *dt);
 		}
 		else if (c <= a && c <= b && c <= d && c <= e){
 			*dt = tau * c;
+            printf("dt_c = %f \n", *dt);
 		}
         else if (d <= a && d <= b && d <= c && d <= e){
             *dt = tau * d;
+            printf("dt_d = %f \n", *dt);
+
         }
         else {
             *dt = tau * e;
+            printf("dt_e = %f \n", *dt);
         }
 	}
 }
@@ -282,72 +289,32 @@ void calculate_uv(
                   double **P,
                   int **Flag
                   ){
-	int i;
-	int j;
-	for(i = 1; i <= imax; i++){
-		for(j = 1; j <= jmax; j++){
-			/*
-			 * Check that the cell is a fluid cell.
-			 */
-			if((Flag[i][j]&B_C)==B_C){
-				/*Calculate the new velocity U according to the formula above*/
-				if(i<imax){
-					U[i][j] = F[i][j]-(dt/dx)*(P[i+1][j]-P[i][j]);
-				}
-				/*Calculate the new velocity V according to the formula above*/
-				if(j<jmax){
-					V[i][j] = G[i][j]-(dt/dy)*(P[i][j+1]-P[i][j]);
-				}
-			}
-/*			else if((Flag[i][j]&31)==B_N){
-				V[i][j]=0;
-				U[i-1][j]=-1*U[i-1][j+1];
-				U[i][j]=-1*U[i][j+1];
-			}
-			else if((Flag[i][j]&31)==B_S){
-				V[i][j-1]=0;
-				U[i-1][j]=-1*U[i-1][j-1];
-				U[i][j]=-1*U[i][j-1];
-			}
-			else if((Flag[i][j]&31)==B_W){
-				U[i-1][j]=0;
-				V[i][j-1]=-1*V[i-1][j-1];
-				V[i][j]=-1*V[i-1][j];
-			}
-			else if((Flag[i][j]&31)==B_O){
-				U[i][j]=0;
-				V[i][j-1]=-1*V[i+1][j-1];
-				V[i][j]=-1*V[i+1][j];
-			}
-			else if((Flag[i][j]&31)==B_NO){
-				U[i][j]=0;
-				U[i-1][j]=-1*U[i-1][j+1];
-				V[i][j]=0;
-				V[i][j-1]=-1*V[i+1][j-1];
-			}
-			else if((Flag[i][j]&31)==B_NW){
-				U[i-1][j]=0;
-				U[i][j]=-1*U[i][j+1];
-				V[i][j]=0;
-				V[i][j-1]=-1*V[i-1][j-1];
-			}
-			else if((Flag[i][j]&31)==B_SO){
-				U[i][j]=0;
-				U[i-1][j]=-1*U[i-1][j-1];
-				V[i][j-1]=0;
-				V[i][j]=-1*V[i+1][j];
-			}
-			else if((Flag[i][j]&31)==B_SW){
-				U[i-1][j]=0;
-				U[i][j]=-1*U[i][j-1];
-				V[i][j]=-1*V[i-1][j];
-				V[i][j-1]=0;
-			}
-*/
-		}
-	}
+    int i;
+    int j;
+    for(i = 1; i <= imax; i++){
+        for(j = 1; j <= jmax; j++){
+            /*
+             * Check that the cell is a fluid cell.
+             */
+            if((Flag[i][j]&B_C)==B_C){
+                /*Calculate the new velocity U according to the formula above*/
+                if(i<imax&&(Flag[i+1][j]&31)!=B_NW&&(Flag[i+1][j]&31)!=B_SW){
+                    U[i][j] = F[i][j]-(dt/dx)*(P[i+1][j]-P[i][j]);
+                }
+                else if(i<imax){
+                    U[i][j] = F[i][j];
+                }
+                /*Calculate the new velocity V according to the formula above*/
+                if(j<jmax&&(Flag[i][j+1]&31)!=B_SW&&(Flag[i][j+1]&31)!=B_SO){
+                    V[i][j] = G[i][j]-(dt/dy)*(P[i][j+1]-P[i][j]);
+                }
+                else if(j<jmax){
+                    V[i][j] = G[i][j];
+                }
+            }
+        }
+    }
 }
-
 
 /* ----------------------------------------------------------------------- */
 /*                             Function Compute temperatue (Fluid)         */
