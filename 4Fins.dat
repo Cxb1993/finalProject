@@ -107,7 +107,7 @@ dp		0.0
 #             Fins for heat sink
 #--------------------------------------------
 fins		4
-finWidth	8
-finHeight	24
-finDistance	12
-finCore		10
+finWidth	6
+finHeight	14
+finDistance     12
+finCore		8
