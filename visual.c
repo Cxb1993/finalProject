@@ -83,7 +83,7 @@ void write_vtkFile(const char *szProblem,
 	}
 
     fprintf(fp,"\n");
-	fprintf(fp, "SCALARS medium(F or S) int 1 \n");
+	fprintf(fp, "SCALARS Fluid(0)_or_Solid(1) int 1 \n");
 	fprintf(fp, "LOOKUP_TABLE default \n");
 	for(j = 1; j < jmax+1; j++) {
 		for(i = 1; i < imax+1; i++) {
