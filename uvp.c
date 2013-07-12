@@ -236,25 +236,25 @@ void calculate_dt(
         e = (1/Kappa)/(2.0*(1.0/(dx*dx)+1.0/(dy*dy)));
 		if     (a <= b && a <= c && a <= d && a <= e){
 			*dt = tau * a;
-            printf("dt_reynold = %f \n", *dt);
+/*            printf("dt_reynold = %f \n", *dt);*/
 
 		}
 		else if (b <= a && b <= c && b <= d && b <= e){
 			*dt = tau * b;
-            printf("dt_umax = %f \n", *dt);
+/*            printf("dt_umax = %f \n", *dt);*/
 		}
 		else if (c <= a && c <= b && c <= d && c <= e){
 			*dt = tau * c;
-            printf("dt_vmax = %f \n", *dt);
+/*            printf("dt_vmax = %f \n", *dt);*/
 		}
         else if (d <= a && d <= b && d <= c && d <= e){
             *dt = tau * d;
-            printf("dt_prandtl = %f \n", *dt);
+/*            printf("dt_prandtl = %f \n", *dt);*/
 
         }
         else {
             *dt = tau * e;
-            printf("dt_diffusion = %f \n", *dt);
+/*            printf("dt_diffusion = %f \n", *dt);*/
         }
 	}
 }
