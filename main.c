@@ -151,8 +151,6 @@ int main(int argc, char** argv){
 	while (t<=t_end){
 		/*	Select dt*/
 		calculate_dt(Re, Pr, Kappa, tau, &dt, dx, dy, imax, jmax, U, V, Flag);
-        
-        printf("t = %f \n", t);
         /*solid solver*/
         /*	Set boundary values for Temperature for solid*/
 		TEMP_BoundaryCondition_Solid( dx, dy, imax, jmax, TEMP, TEMP_S, wlt, wrt, wtt, wbt, TL, TR, TB, TT, QL, QR, QB, QT, kratio, Flag);
@@ -190,12 +188,9 @@ int main(int argc, char** argv){
 		/*	Compute u(n+1) and v(n+1) according to (7),(8)*/
 		calculate_uv(dt, dx, dy, imax, jmax, U, V, F, G, P, Flag);
 		/*	Output of u; v; p values for visualization, if necessary*/
-        
-        
-        
-        
-		n_div=(int)(dt_value/dt);
+        n_div=(int)(dt_value/dt);
 		if(n % n_div == 0){
+            printf("time = %f and time step = %d\n", t, n);
 			write_vtkFile(problem, n , xlength, ylength, imax, jmax, dx, dy, U, V, P, TEMP, TEMP_S , Flag);
 /*            printf("t = %f and dt = %f and number of iteration is %d\n", t , dt, n);*/
 

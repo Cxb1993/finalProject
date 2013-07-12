@@ -209,6 +209,7 @@ void spec_boundary_val(
 			U[i][jmax+1]= 2.0-1*U[i][jmax];
 		}
 	}
+
 	/*
 	 * Special boundary condition for the Karman Vortex street
 	 * problem
@@ -228,6 +229,12 @@ void spec_boundary_val(
 			V[0][j]= 0.0;
 		}
 		for (j = ((jmax)/2) + 1; j < jmax + 1; j++){
+			U[0][j] = 1.0;
+			V[0][j]= 0.0;
+		}
+	}
+	if(strcmp(problem,"2FinsT")==0){
+		for (j = 1; j < jmax + 1; j++){
 			U[0][j] = 1.0;
 			V[0][j]= 0.0;
 		}

@@ -232,7 +232,7 @@ void init_uvp(
 				P[i][j] = PI ;
 				TEMP[i][j] = TI ;
 			}
-            else if ((Flag[i][j]&0)==0){
+            else if ((Flag[i][j]&B_C)!=B_C){
                 TEMP_S[i][j] = TSI;
             }
 			else{
