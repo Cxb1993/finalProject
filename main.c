@@ -190,7 +190,7 @@ int main(int argc, char** argv){
 		/*	Output of u; v; p values for visualization, if necessary*/
         n_div=(int)(dt_value/dt);
 		if(n % n_div == 0){
-            printf("time = %f and time step = %d\n", t, n);
+            printf("time = %f and time step = %d & dt = %f \n", t, n, dt);
 			write_vtkFile(problem, n , xlength, ylength, imax, jmax, dx, dy, U, V, P, TEMP, TEMP_S , Flag);
 /*            printf("t = %f and dt = %f and number of iteration is %d\n", t , dt, n);*/
 
