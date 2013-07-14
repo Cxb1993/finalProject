@@ -19,7 +19,7 @@ all:  $(OBJ)
 	$(CC) -c $(CFLAGS) $*.c -o $*.o
 
 clean:
-	rm -f $(OBJ) sim
+	rm -f $(OBJ) sim *.pgm
 
 helper.o      : helper.h 
 init.o        : helper.h init.h 

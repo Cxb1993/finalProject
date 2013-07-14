@@ -111,10 +111,15 @@ int main(int argc, char** argv){
 	int finDistance;
 	int finCore;
 
+    printf("Simulation of heat transfer of %s for %s case is started.\n",argv[1], argv[2]);
+
 	/* read the program configuration file using read_parameters()*/
 	read_parameters(&Re, &Pr, &beta, &kratio, &Kappa, &UI, &VI, &PI, &TI, &TSI, &GX, &GY, &t_end, &xlength, &ylength, &dt, &dx, &dy, &imax,
 			&jmax, &alpha, &omg, &gamma, &tau, &itermax, &eps, &dt_value, &wl, &wr, &wt, &wb, problem, &lp, &rp, &dp,
 			&wlt, &wrt, &wtt, &wbt, &TL, &TR, &TB, &TT, &QL, &QR, &QB, &QT, argc, argv[1],&fins, &finWidth, &finHeight, &finDistance, &finCore);
+    printf("\n");
+    printf("Reading Parameters from data file is done.\n");
+    printf("\n");
 
 	/* set up the matrices (arrays) needed using the matrix() command*/
 	U = matrix(0, imax+1, 0, jmax+1);
@@ -141,24 +146,44 @@ int main(int argc, char** argv){
 	else{
 		create_geometry(pgmFile, imax, jmax, dx, dy, fins, finWidth, finHeight, finDistance, finCore, horizontal);
 	}
+
 	init_flag(problem, imax, jmax, lp, rp, dp, Flag);
+    printf("\n");
+    printf("Flag field is initialized.\n");
+
+    
 	init_uvp(UI, VI, PI, TI, TSI, imax, jmax, U, V, P, TEMP, TEMP_S, Flag);
+    printf("\n");
+    printf("Velocities, Pressure and Temperature fields are initialized both in solid and fluid.\n");
 
 	/* ----------------------------------------------------------------------- */
 	/*                             Performing the main loop                    */
 	/* ----------------------------------------------------------------------- */
-
+    printf("\n");
+    printf("Main loop started executing. Information down here are going to be printed every %f second of simulation time.\n", dt_value);
 	while (t<=t_end){
+        n_div=(int)(dt_value/dt);
 		/*	Select dt*/
 		calculate_dt(Re, Pr, Kappa, tau, &dt, dx, dy, imax, jmax, U, V, Flag);
+		if(n % n_div == 0){
+            printf("\n");
+            printf("Simulation at time = %f with step size(dt) = %f is started\n", t+dt, dt);
+        }
         /*solid solver*/
         /*	Set boundary values for Temperature for solid*/
 		TEMP_BoundaryCondition_Solid( dx, dy, imax, jmax, TEMP, TEMP_S, wlt, wrt, wtt, wbt, TL, TR, TB, TT, QL, QR, QB, QT, kratio, Flag);
 		/*  Set special temperature boundary values according to the problem for solid*/
 		TEMP_SpecBoundaryCondition_Solid( problem, imax, jmax, TEMP_S, Flag);
+        if(n % n_div == 0){
+            printf("\n");
+            printf("Temperature boundary conditions for solid are set using values of from previous time step.\n");
+        }
 		/*  Compute temperature for solid*/
         COMP_TEMP_Solid(dt, dx, dy, imax, jmax, TEMP, TEMP_S, Flag, Kappa);
-        
+        if(n % n_div == 0){
+            printf("\n");
+            printf("Energy equation for temperature in solid (transient conduction) is solved explicitly.\n");
+        }
         /*fluid solver*/
 		/*	Set boundary values for u and v according to (14),(15)*/
 		boundaryvalues(imax, jmax, U, V, wl, wr, wt, wb, Flag);
@@ -168,8 +193,16 @@ int main(int argc, char** argv){
 		TEMP_BoundaryCondition( dx,dy,imax, jmax, TEMP, TEMP_S, wlt, wrt, wtt, wbt, TL, TR, TB, TT, QL, QR, QB, QT, kratio, Flag);
 		/*  Set special temperature boundary values according to the problem*/
 		TEMP_SpecBoundaryCondition( problem, imax, jmax, TEMP, Flag);
+        if(n % n_div == 0){
+            printf("\n");
+            printf("Temperature and velocities boundary conditions for fluid are set using new values of solid at interface.\n");
+        }
 		/*  Compute temperature according to (9.20)*/
 		COMP_TEMP(dt, dx, dy, imax, jmax, U, V, F, G, TEMP, Flag, GX, GY, gamma, Re, Pr, beta);
+        if(n % n_div == 0){
+            printf("\n");
+            printf("Energy equation for temperature in fluid (convection diffusion) is solved.\n");
+        }
 		/*	Compute F(n) and G(n) according to (9),(10),(17)*/
 		calculate_fg(Re, GX, GY, alpha, dt, dx, dy, imax, jmax, U, V ,F , G, TEMP, beta, Flag);
 		/*	Compute the right-hand side rs of the pressure equation (11)*/
@@ -185,22 +218,29 @@ int main(int argc, char** argv){
 			/*	it := it + 1*/
 			it++;
 		}
+        if(n % n_div == 0){
+            printf("\n");
+            printf("Sor solver for solving Poisson equation in fluid is converged with %d iterations.\n",it);
+        }
+
 		/*	Compute u(n+1) and v(n+1) according to (7),(8)*/
 		calculate_uv(dt, dx, dy, imax, jmax, U, V, F, G, P, Flag);
+        if(n % n_div == 0){
+            printf("\n");
+            printf("New velocities value in fluid are calculated using new pressure values.\n");
+        }
 		/*	Output of u; v; p values for visualization, if necessary*/
-        n_div=(int)(dt_value/dt);
 		if(n % n_div == 0){
-            printf("time = %f and time step = %d & dt = %f \n", t, n, dt);
-			write_vtkFile(problem, n , xlength, ylength, imax, jmax, dx, dy, U, V, P, TEMP, TEMP_S , Flag);
-/*            printf("t = %f and dt = %f and number of iteration is %d\n", t , dt, n);*/
-
+            printf("\n");
+            printf("Calculated values are written to a VTK file.\n");
+            write_vtkFile(problem, n , xlength, ylength, imax, jmax, dx, dy, U, V, P, TEMP, TEMP_S , Flag);
+            printf("\n");
+            printf("Simulation at time = %f which is time step %d is Finished\n", t+dt, n+1);
 		}
-
 		/*	t := t + dt*/
 		t = t + dt;
 		/*	n := n + 1*/
 		n++;
-
 	}
 
 	/* Destroy memory allocated*/
@@ -212,5 +252,6 @@ int main(int argc, char** argv){
 	free_matrix(F, 0, imax+1, 0, jmax+1);
 	free_matrix(G, 0, imax+1, 0, jmax+1);
 	free_imatrix(Flag, 0, imax+1, 0, jmax+1);
+    printf("Simulation of heat transfer of %s for %s case is finished and allocated memories are destroyed\n",argv[1], argv[2]);
 	return -1;
 }
